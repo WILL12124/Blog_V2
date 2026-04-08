@@ -1,25 +1,19 @@
 ---
-title: "STM32 PWM dimming lab"
-date: "2026-04-05"
-category: "electronics"
-excerpt: "Timer PWM to drive an LED, with the key registers called out."
-tags: ["electronics", "STM32", "PWM"]
+title: "Personal Website v2"
+date: "2026-04-08"
+category: "small project"
+excerpt: "A Personal Website, my tinkering jouney starts here!"
+tags: ["web-development", "Cloudflare"]
 ---
 
-Quick lab notes on PWM dimming.
+Finally! after about 4 hours of chatting with ai, i made this static webpage run on Cloudflare Pages and deployed on my custom domain. I didn't realize the time and now it's 1:21am already, I'd probably go to bed after posting this.
 
-Core helper:
+I genuinely found building something internet-related is cool and fun. I remember tonight i first started browsing building personal VPS stuffs, look where i am now at :). I found this edgetunnel thing that uses Cloudeflare to bypass the GFW. It made me remember my personal blog v1 (on Github Pages) and decided to bring it further.
 
-```c
-void pwm_set(uint16_t duty) {
-  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, duty);
-}
-```
+Next: Refine the webpage and consider using Cloudflare Workers for small backend
 
-Duty cycle:
-
-$$
-D = \frac{T_{on}}{T} \times 100\%
-$$
-
-Next: add ADC feedback for closed-loop brightness.
+Special Thanks:
+Claude Sonnet 4.6
+Claude Opus 4.6
+Gemini 3.1 pro
+Cursor
