@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="个人博客 — 生活与电子项目，编辑感排版与玻璃拟态界面。"
+    />
+    <title>WILL'S BLOG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Sora:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/github-dark.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body data-theme="life" data-view="landing">
+    <div class="ambient" aria-hidden="true">
+      <div class="mesh"></div>
+      <span class="orb orb-a"></span>
+      <span class="orb orb-b"></span>
+      <span class="orb orb-c"></span>
+      <div class="grid-fade"></div>
+      <div class="grain"></div>
+    </div>
+
+    <section id="landing" class="landing" aria-label="起始页">
+      <header class="landing-top">
+        <a href="/" class="logo-mark">WILL'S BLOG</a>
+        <div class="landing-top-actions">
+          <button
+            type="button"
+            class="theme-preview"
+            id="landingThemePreview"
+            aria-pressed="false"
+            title="预览暗色背景（不进入博客）"
+          >
+            <span class="theme-preview-inner">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12Zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM11 1h2v3h-2V1Zm0 19h2v3h-2v-3ZM3.515 4.929l1.414 1.414L2.05 8.212.636 6.798l2.828-2.829Zm14.95 14.95 1.414 1.414-2.829 2.828-1.414-1.414 2.828-2.829ZM22 11v2h-3v-2h3ZM4 11v2H1v-2h3Zm14.95-6.071-1.414 1.414-2.828-2.829 1.414-1.414 2.828 2.829ZM6.464 17.536 4.05 18.95l-2.829-2.828 1.414-1.414 2.829 2.828Z"
+                />
+              </svg>
+              <span id="landingThemeLabel">预览暗色</span>
+            </span>
+          </button>
+          <a href="#blog" class="link-ghost" id="skipToBlog">进入阅读</a>
+        </div>
+      </header>
+
+      <div class="landing-grid">
+        <div class="landing-col landing-col--main">
+          <p class="landing-kicker reveal" style="--d: 0.05s">Journal · Build · Notes</p>
+          <h1 class="landing-title reveal" style="--d: 0.12s">
+            把日子写成
+            <span class="landing-title-line">可回看的</span>
+            <span class="landing-title-accent">章节</span>
+          </h1>
+          <p class="landing-lead reveal" style="--d: 0.2s">
+            生活与电子项目分栏呈现：亮色记录日常，暗色承载电路与公式。Markdown、代码高亮、LaTeX 一体。
+          </p>
+
+          <div class="landing-cta reveal" style="--d: 0.28s">
+            <button type="button" class="card-enter card-enter--life" id="enterLife">
+              <span class="card-enter-top">
+                <span class="card-enter-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32L19.07 4.93" />
+                  </svg>
+                </span>
+                <span class="card-enter-label">生活记录</span>
+              </span>
+              <span class="card-enter-hint">亮色界面 · 随笔、行程与灵感</span>
+              <span class="card-enter-cta">
+                进入
+                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </span>
+            </button>
+
+            <button type="button" class="card-enter card-enter--elec" id="enterElec">
+              <span class="card-enter-top">
+                <span class="card-enter-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                    <path d="M9 9h6v6H9zM9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M1 9h3M20 15h3M1 15h3" />
+                  </svg>
+                </span>
+                <span class="card-enter-label">电子项目</span>
+              </span>
+              <span class="card-enter-hint">暗色界面 · 原理图、代码与测量</span>
+              <span class="card-enter-cta">
+                进入
+                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <aside class="landing-col landing-col--aside" aria-label="站点摘要">
+          <div class="bento bento--mesh reveal" style="--d: 0.18s">
+            <span class="bento-tag">Stack</span>
+            <p class="bento-title">静态 · 边缘 · 可读</p>
+            <ul class="bento-list">
+              <li>Cloudflare Worker 托管</li>
+              <li>构建生成文章索引</li>
+              <li>阅读优先的版面节奏</li>
+            </ul>
+          </div>
+          <div class="bento bento--accent reveal" style="--d: 0.26s">
+            <span class="bento-tag">Today</span>
+            <p class="bento-quote">「写下来的东西，才算真正经过思考。」</p>
+            <span class="bento-meta">— 博客札记</span>
+          </div>
+        </aside>
+      </div>
+
+      <div class="landing-strip glass-subtle reveal" style="--d: 0.34s">
+        <div class="strip-item">
+          <strong>发布</strong>
+          <span>Markdown → build → deploy</span>
+        </div>
+        <div class="strip-item">
+          <strong>技术内容</strong>
+          <span>Highlight.js · KaTeX</span>
+        </div>
+        <div class="strip-item">
+          <strong>访问</strong>
+          <span>全球边缘网络加速</span>
+        </div>
+      </div>
+
+      <footer class="landing-foot">
+        <span>© <span id="year"></span> WILL'S BLOG</span>
+        <span class="dot" aria-hidden="true">·</span>
+        <span>Editorial × Glass</span>
+      </footer>
+    </section>
+
+    <div id="blogShell" class="blog-shell is-hidden" data-hidden="true">
+      <header class="glass header">
+        <button type="button" class="nav-back" id="backHome" title="返回起始页">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M15 6l-6 6 6 6" />
+          </svg>
+          首页
+        </button>
+        <div class="brand-wrap">
+          <span class="brand">WILL'S BLOG</span>
+        </div>
+        <div class="header-actions">
+          <button id="modeToggle" class="toggle-btn" type="button">
+            切换到电子项目模式
+          </button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <aside class="glass sidebar">
+          <h2 id="sidebarTitle">生活记录</h2>
+          <p id="sidebarDesc">亮色主题，记录日常。</p>
+          <div id="postList" class="post-list"></div>
+        </aside>
+
+        <article class="glass content">
+          <div class="content-inner">
+            <h1 id="postTitle">欢迎</h1>
+            <p id="postMeta" class="meta">请选择左侧文章</p>
+            <div id="postBody" class="markdown-body">
+              在 <code>content/posts</code> 新增 Markdown 后运行
+              <code>npm run build:posts</code> 即可发布。
+            </div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/languages/javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/languages/c.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/languages/cpp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/languages/python.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

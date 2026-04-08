@@ -1,0 +1,7 @@
+name = "personal-glass-blog"
+main = "src/worker.js"
+compatibility_date = "2026-04-07"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"

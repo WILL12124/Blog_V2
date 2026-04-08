@@ -1,0 +1,1099 @@
+/* Design direction: Editorial magazine + Liquid glass (per frontend-design skill).
+   Tokens + motion + focus (per ui-ux-pro-max checklist). */
+
+:root {
+  --font-display: "Fraunces", "Noto Serif SC", "Songti SC", serif;
+  --font-sans: "Sora", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+
+  --focus: #0d9488;
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Life: warm paper + teal accent (avoid generic purple-on-white) */
+  --life-bg: #f7f4ef;
+  --life-bg-mesh: radial-gradient(ellipse 90% 70% at 10% 10%, rgba(13, 148, 136, 0.09), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 20%, rgba(194, 65, 12, 0.06), transparent 50%),
+    linear-gradient(165deg, #fdfcfa 0%, #eef6f4 48%, #f3f0eb 100%);
+  --life-text: #1c1917;
+  --life-muted: #57534e;
+  --life-glass: rgba(255, 255, 255, 0.52);
+  --life-border: rgba(255, 255, 255, 0.72);
+  --life-accent: #0d9488;
+  --life-accent-2: #c2410c;
+  --life-accent-soft: rgba(13, 148, 136, 0.12);
+  --life-shadow: 0 18px 50px rgba(28, 25, 23, 0.08);
+
+  /* Electronics: OLED-adjacent + cyan accent + subtle HUD grid */
+  --elec-bg: #030712;
+  --elec-bg-mesh: radial-gradient(ellipse 100% 80% at 50% -20%, rgba(34, 211, 238, 0.12), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(99, 102, 241, 0.08), transparent 50%),
+    linear-gradient(180deg, #0b1220 0%, #030712 55%, #000 100%);
+  --elec-text: #f8fafc;
+  --elec-muted: #94a3b8;
+  --elec-glass: rgba(15, 23, 42, 0.58);
+  --elec-border: rgba(148, 163, 184, 0.2);
+  --elec-accent: #22d3ee;
+  --elec-accent-soft: rgba(34, 211, 238, 0.14);
+  --elec-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  color: var(--life-text);
+  background-color: var(--life-bg);
+  background-image: var(--life-bg-mesh);
+  background-attachment: fixed;
+  transition: color 0.35s var(--ease-out), background 0.35s var(--ease-out);
+}
+
+body[data-theme="electronics"] {
+  color: var(--elec-text);
+  background-color: var(--elec-bg);
+  background-image: var(--elec-bg-mesh);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+body[data-theme="electronics"] a:focus-visible,
+body[data-theme="electronics"] button:focus-visible {
+  outline-color: var(--elec-accent);
+}
+
+.icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex-shrink: 0;
+}
+
+.icon-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* —— 环境 —— */
+.ambient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.mesh {
+  position: absolute;
+  inset: 0;
+  opacity: 0.85;
+  background: radial-gradient(circle at 20% 30%, rgba(13, 148, 136, 0.15), transparent 42%),
+    radial-gradient(circle at 78% 22%, rgba(194, 65, 12, 0.1), transparent 40%);
+}
+
+body[data-theme="electronics"] .mesh {
+  background: radial-gradient(circle at 30% 20%, rgba(34, 211, 238, 0.08), transparent 45%),
+    radial-gradient(circle at 70% 80%, rgba(99, 102, 241, 0.06), transparent 40%);
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  opacity: 0.5;
+  animation: float 24s ease-in-out infinite;
+}
+
+.orb-a {
+  width: min(440px, 88vw);
+  height: min(440px, 88vw);
+  top: -14%;
+  left: -12%;
+  background: radial-gradient(circle, rgba(13, 148, 136, 0.35) 0%, transparent 68%);
+}
+
+.orb-b {
+  width: min(380px, 80vw);
+  height: min(380px, 80vw);
+  bottom: -8%;
+  right: -10%;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.2) 0%, transparent 65%);
+  animation-delay: -9s;
+}
+
+.orb-c {
+  width: 240px;
+  height: 240px;
+  top: 48%;
+  left: 42%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, transparent 62%);
+  opacity: 0.35;
+  animation-delay: -16s;
+}
+
+body[data-theme="electronics"] .orb-a {
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.25) 0%, transparent 70%);
+  opacity: 0.55;
+}
+
+body[data-theme="electronics"] .orb-b {
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 68%);
+}
+
+body[data-theme="electronics"] .orb-c {
+  background: radial-gradient(circle, rgba(148, 163, 184, 0.12) 0%, transparent 65%);
+  opacity: 0.4;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  40% {
+    transform: translate(3%, -2%) scale(1.02);
+  }
+  70% {
+    transform: translate(-2%, 3%) scale(0.99);
+  }
+}
+
+.grid-fade {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-image: linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent);
+}
+
+body[data-theme="electronics"] .grid-fade {
+  opacity: 0.55;
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* —— 起始页 —— */
+.landing {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(16px, 4vw, 36px);
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.landing-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: clamp(28px, 7vh, 64px);
+}
+
+.landing-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.logo-mark {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  color: inherit;
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: var(--life-glass);
+  border: 1px solid var(--life-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--life-shadow);
+  cursor: pointer;
+  transition: transform 0.22s var(--ease-out), box-shadow 0.22s var(--ease-out);
+}
+
+.logo-mark:hover {
+  transform: translateY(-1px);
+}
+
+body[data-theme="electronics"] .logo-mark {
+  background: var(--elec-glass);
+  border-color: var(--elec-border);
+  box-shadow: var(--elec-shadow);
+}
+
+.theme-preview {
+  border: 1px solid rgba(120, 113, 108, 0.2);
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  padding: 0;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--life-muted);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.theme-preview-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+}
+
+body[data-theme="electronics"] .theme-preview {
+  background: rgba(15, 23, 42, 0.65);
+  border-color: var(--elec-border);
+  color: var(--elec-muted);
+}
+
+.theme-preview[aria-pressed="true"] {
+  border-color: rgba(13, 148, 136, 0.45);
+}
+
+body[data-theme="electronics"] .theme-preview[aria-pressed="true"] {
+  border-color: rgba(34, 211, 238, 0.45);
+}
+
+.link-ghost {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--life-muted);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  transition: color 0.2s, background 0.2s;
+  cursor: pointer;
+}
+
+.link-ghost:hover {
+  color: var(--life-accent);
+  background: var(--life-accent-soft);
+}
+
+body[data-theme="electronics"] .link-ghost {
+  color: var(--elec-muted);
+}
+
+body[data-theme="electronics"] .link-ghost:hover {
+  color: var(--elec-accent);
+  background: var(--elec-accent-soft);
+}
+
+.landing-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  gap: clamp(20px, 4vw, 40px);
+  align-items: start;
+  flex: 1;
+}
+
+@media (max-width: 960px) {
+  .landing-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.landing-col--main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.5vh, 24px);
+  padding-top: clamp(8px, 2vh, 24px);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: riseIn 0.75s var(--ease-out) forwards;
+  animation-delay: var(--d, 0s);
+}
+
+@keyframes riseIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--life-muted);
+}
+
+body[data-theme="electronics"] .landing-kicker {
+  color: var(--elec-muted);
+}
+
+.landing-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.4rem, 6.5vw, 3.75rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  max-width: 12ch;
+}
+
+.landing-title-line {
+  display: block;
+  color: var(--life-muted);
+  font-weight: 500;
+  font-size: 0.62em;
+  letter-spacing: 0.02em;
+  margin-top: 0.2em;
+}
+
+body[data-theme="electronics"] .landing-title-line {
+  color: var(--elec-muted);
+}
+
+.landing-title-accent {
+  display: inline-block;
+  margin-top: 0.12em;
+  background: linear-gradient(120deg, var(--life-accent) 0%, var(--life-accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+body[data-theme="electronics"] .landing-title-accent {
+  background: linear-gradient(120deg, #22d3ee 0%, #a78bfa 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.landing-lead {
+  margin: 0;
+  max-width: 38rem;
+  font-size: 1.06rem;
+  color: var(--life-muted);
+  font-weight: 400;
+}
+
+body[data-theme="electronics"] .landing-lead {
+  color: var(--elec-muted);
+}
+
+.landing-cta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.card-enter {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 22px 22px 18px;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid var(--life-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.38);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: var(--life-shadow);
+  transition: transform 0.26s var(--ease-out), box-shadow 0.26s var(--ease-out), border-color 0.26s;
+  color: inherit;
+  font: inherit;
+  overflow: hidden;
+}
+
+.card-enter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.26s;
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.12), transparent 55%);
+}
+
+.card-enter:hover::before {
+  opacity: 1;
+}
+
+.card-enter:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 26px 60px rgba(28, 25, 23, 0.12);
+  border-color: rgba(13, 148, 136, 0.35);
+}
+
+.card-enter--elec:hover {
+  border-color: rgba(34, 211, 238, 0.4);
+}
+
+.card-enter--elec::before {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.12), transparent 55%);
+}
+
+body[data-theme="electronics"] .card-enter {
+  background: rgba(15, 23, 42, 0.5);
+  border-color: var(--elec-border);
+  box-shadow: var(--elec-shadow);
+}
+
+body[data-theme="electronics"] .card-enter:hover {
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+}
+
+.card-enter-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-enter-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(13, 148, 136, 0.12);
+  color: var(--life-accent);
+}
+
+.card-enter--elec .card-enter-icon {
+  background: rgba(34, 211, 238, 0.12);
+  color: var(--elec-accent);
+}
+
+body[data-theme="electronics"] .card-enter-icon {
+  background: rgba(34, 211, 238, 0.15);
+  color: var(--elec-accent);
+}
+
+.card-enter-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.card-enter-hint {
+  font-size: 0.86rem;
+  opacity: 0.78;
+  line-height: 1.45;
+}
+
+.card-enter-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--life-accent);
+}
+
+body[data-theme="electronics"] .card-enter-cta {
+  color: var(--elec-accent);
+}
+
+/* Bento aside */
+.landing-col--aside {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: sticky;
+  top: 24px;
+}
+
+@media (max-width: 960px) {
+  .landing-col--aside {
+    position: static;
+  }
+}
+
+.bento {
+  border-radius: var(--radius-lg);
+  padding: 20px 20px 18px;
+  border: 1px solid var(--life-border);
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: var(--life-shadow);
+}
+
+.bento--mesh {
+  background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.55), rgba(13, 148, 136, 0.06));
+}
+
+.bento--accent {
+  border-color: rgba(194, 65, 12, 0.18);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.55), rgba(251, 191, 36, 0.08));
+}
+
+body[data-theme="electronics"] .bento {
+  background: rgba(15, 23, 42, 0.55);
+  border-color: var(--elec-border);
+  box-shadow: var(--elec-shadow);
+}
+
+body[data-theme="electronics"] .bento--mesh {
+  background-image: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(34, 211, 238, 0.06));
+}
+
+body[data-theme="electronics"] .bento--accent {
+  border-color: rgba(34, 211, 238, 0.2);
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.75), rgba(99, 102, 241, 0.1));
+}
+
+.bento-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--life-muted);
+  margin-bottom: 10px;
+}
+
+body[data-theme="electronics"] .bento-tag {
+  color: var(--elec-muted);
+}
+
+.bento-title {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.bento-list {
+  margin: 0;
+  padding-left: 1.1em;
+  font-size: 0.9rem;
+  color: var(--life-muted);
+  line-height: 1.55;
+}
+
+body[data-theme="electronics"] .bento-list {
+  color: var(--elec-muted);
+}
+
+.bento-quote {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--life-text);
+}
+
+body[data-theme="electronics"] .bento-quote {
+  color: var(--elec-text);
+}
+
+.bento-meta {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--life-muted);
+}
+
+body[data-theme="electronics"] .bento-meta {
+  color: var(--elec-muted);
+}
+
+.landing-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: clamp(28px, 5vh, 44px);
+  padding: 18px 22px;
+  border-radius: var(--radius-md);
+}
+
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+body[data-theme="electronics"] .glass-subtle {
+  background: rgba(15, 23, 42, 0.45);
+  border-color: var(--elec-border);
+}
+
+.strip-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+}
+
+.strip-item strong {
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.strip-item span {
+  opacity: 0.75;
+}
+
+@media (max-width: 640px) {
+  .landing-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+.landing-foot {
+  margin-top: auto;
+  padding-top: clamp(28px, 6vh, 52px);
+  font-size: 0.8rem;
+  color: var(--life-muted);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+body[data-theme="electronics"] .landing-foot {
+  color: var(--elec-muted);
+}
+
+.landing-foot .dot {
+  opacity: 0.45;
+}
+
+/* —— 视图 —— */
+.blog-shell.is-hidden {
+  display: none;
+}
+
+body[data-view="blog"] .landing {
+  display: none;
+}
+
+body[data-view="blog"] .blog-shell {
+  display: block;
+}
+
+.blog-shell {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 40px;
+}
+
+.glass {
+  background: var(--life-glass);
+  border: 1px solid var(--life-border);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: var(--life-shadow);
+  border-radius: var(--radius-lg);
+  transition: background 0.3s var(--ease-out), border-color 0.3s, box-shadow 0.3s;
+}
+
+body[data-theme="electronics"] .glass {
+  background: var(--elec-glass);
+  border-color: var(--elec-border);
+  box-shadow: var(--elec-shadow);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: 20px auto 18px;
+  width: min(1140px, calc(100vw - 24px));
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+}
+
+.nav-back {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--life-muted);
+  padding: 8px 12px;
+  margin: -8px -12px;
+  border-radius: 12px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.nav-back:hover {
+  color: var(--life-accent);
+  background: var(--life-accent-soft);
+}
+
+body[data-theme="electronics"] .nav-back {
+  color: var(--elec-muted);
+}
+
+body[data-theme="electronics"] .nav-back:hover {
+  color: var(--elec-accent);
+  background: var(--elec-accent-soft);
+}
+
+.brand-wrap {
+  justify-self: center;
+  text-align: center;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+}
+
+.header-actions {
+  justify-self: end;
+}
+
+.toggle-btn {
+  border: 1px solid rgba(120, 113, 108, 0.25);
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.78);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  box-shadow: 0 4px 18px rgba(28, 25, 23, 0.07);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s;
+}
+
+.toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(28, 25, 23, 0.1);
+}
+
+body[data-theme="electronics"] .toggle-btn {
+  background: rgba(15, 23, 42, 0.92);
+  color: #e2e8f0;
+  border-color: var(--elec-border);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+.layout {
+  width: min(1140px, calc(100vw - 24px));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(260px, 300px) 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.sidebar,
+.content {
+  padding: 0;
+}
+
+.content-inner {
+  padding: 26px 28px 32px;
+}
+
+.sidebar {
+  padding: 22px 20px 24px;
+}
+
+.sidebar h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.28rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.sidebar > p {
+  margin: 0 0 18px;
+  font-size: 0.88rem;
+  color: var(--life-muted);
+  line-height: 1.5;
+}
+
+body[data-theme="electronics"] .sidebar > p {
+  color: var(--elec-muted);
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.render-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.95rem;
+}
+
+body[data-theme="electronics"] .render-error {
+  color: #fca5a5;
+}
+
+.empty-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--life-muted);
+}
+
+body[data-theme="electronics"] .empty-hint {
+  color: var(--elec-muted);
+}
+
+.post-card {
+  border: 1px solid rgba(120, 113, 108, 0.15);
+  background: rgba(255, 255, 255, 0.58);
+  border-radius: var(--radius-md);
+  padding: 14px 14px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: transform 0.22s var(--ease-out), border-color 0.22s, box-shadow 0.22s;
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(13, 148, 136, 0.35);
+  box-shadow: 0 12px 32px rgba(28, 25, 23, 0.08);
+}
+
+body[data-theme="electronics"] .post-card {
+  background: rgba(15, 23, 42, 0.72);
+  border-color: var(--elec-border);
+  color: #e2e8f0;
+}
+
+body[data-theme="electronics"] .post-card:hover {
+  border-color: rgba(34, 211, 238, 0.4);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+}
+
+.post-card strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.post-card > span:not(.date) {
+  display: block;
+  font-size: 0.84rem;
+  opacity: 0.82;
+  line-height: 1.45;
+}
+
+.post-card .date {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.62;
+  margin-top: 10px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.content h1 {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 3.2vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.meta {
+  margin: 0 0 22px;
+  padding-bottom: 18px;
+  font-size: 0.84rem;
+  color: var(--life-muted);
+  border-bottom: 1px solid rgba(120, 113, 108, 0.12);
+}
+
+body[data-theme="electronics"] .meta {
+  color: var(--elec-muted);
+  border-bottom-color: rgba(148, 163, 184, 0.15);
+}
+
+.markdown-body {
+  font-size: 1.03rem;
+  line-height: 1.78;
+  max-width: 65ch;
+}
+
+.markdown-body > *:first-child {
+  margin-top: 0;
+}
+
+.markdown-body > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body p {
+  margin: 0 0 1.05em;
+}
+
+.markdown-body h2,
+.markdown-body h3 {
+  font-family: var(--font-display);
+  margin: 1.45em 0 0.55em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.markdown-body h2 {
+  font-size: 1.35rem;
+}
+
+.markdown-body h3 {
+  font-size: 1.12rem;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0 0 1em;
+  padding-left: 1.35em;
+}
+
+.markdown-body li {
+  margin: 0.38em 0;
+}
+
+.markdown-body a {
+  color: var(--life-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+body[data-theme="electronics"] .markdown-body a {
+  color: var(--elec-accent);
+}
+
+.markdown-body blockquote {
+  margin: 1.1em 0;
+  padding: 14px 18px;
+  border-left: 3px solid var(--life-accent-2);
+  background: rgba(194, 65, 12, 0.06);
+  border-radius: 0 14px 14px 0;
+  font-style: italic;
+}
+
+body[data-theme="electronics"] .markdown-body blockquote {
+  border-left-color: var(--elec-accent);
+  background: rgba(34, 211, 238, 0.08);
+}
+
+.markdown-body pre {
+  border-radius: var(--radius-md);
+  overflow: auto;
+  margin: 1.05em 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.markdown-body code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+
+.markdown-body :not(pre) > code {
+  padding: 0.15em 0.45em;
+  border-radius: 6px;
+  background: rgba(28, 25, 23, 0.06);
+}
+
+body[data-theme="electronics"] .markdown-body :not(pre) > code {
+  background: rgba(148, 163, 184, 0.14);
+}
+
+@media (max-width: 900px) {
+  .header {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .nav-back {
+    justify-self: center;
+    order: 1;
+  }
+
+  .brand-wrap {
+    order: 0;
+  }
+
+  .header-actions {
+    order: 2;
+    justify-self: center;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "cf-worker-glass-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:posts": "node scripts/build-posts.mjs",
+    "dev": "npm run build:posts && wrangler dev",
+    "deploy": "npm run build:posts && wrangler deploy"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3",
+    "wrangler": "^4.13.2"
+  }
+}
