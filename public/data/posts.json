@@ -1,5 +1,17 @@
 [
   {
+    "slug": "life-first",
+    "title": "Recent days",
+    "date": "2026-04-09",
+    "excerpt": "Guess i have to write sth",
+    "tags": [
+      "life",
+      "journal"
+    ],
+    "category": "life",
+    "content": "\r\nThe finals are comming, i should probably go study MIE100 :\\\r\n\r\nA tiny formula from MIE, just to check my LaTex rendering:\r\n\r\n$$\\vec{a}B = \\vec{a}A + \\vec{a}{BA}^{\\tau} + \\vec{a}{BA}^{n}$$\r\n\r\nAcceleration between to points on rigid body (2D)\r\n"
+  },
+  {
     "slug": "electronics-first",
     "title": "Personal Website v2",
     "date": "2026-04-08",
@@ -10,17 +22,5 @@
     ],
     "category": "electronics",
     "content": "\r\nFinally! after about 4 hours of chatting with ai, i made this static webpage run on Cloudflare Pages and deployed on my custom domain. I didn't realize the time and now it's 1:21am already, I'd probably go to bed after posting this.\r\n\r\nI genuinely found building something internet-related is cool and fun. I remember tonight i first started browsing building personal VPS stuffs, look where i am now at :). I found this edgetunnel thing that uses Cloudeflare to bypass the GFW. It made me remember my personal blog v1 (on Github Pages) and decided to bring it further.\r\n\r\nNext: Refine the webpage and consider using Cloudflare Workers for small backend\r\n\r\nSpecial Thanks:\r\nClaude Sonnet 4.6\r\nClaude Opus 4.6\r\nGemini 3.1 pro\r\nCursor\r\n"
-  },
-  {
-    "slug": "life-first",
-    "title": "Recent days",
-    "date": "2026-04-06",
-    "excerpt": "Rhythms worth keeping and small moments worth saving.",
-    "tags": [
-      "life",
-      "journal"
-    ],
-    "category": "life",
-    "content": "\r\nI've been walking 30 minutes every day—my head feels steadier for it.\r\n\r\nToday's list:\r\n\r\n- Clear the bench\r\n- Write docs for an old project\r\n- Read one chapter on hardware design before bed\r\n\r\nA tiny formula, just because:\r\n\r\n$$\r\nE = mc^2\r\n$$\r\n"
   }
 ]

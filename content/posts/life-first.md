@@ -1,21 +1,15 @@
 ---
 title: "Recent days"
-date: "2026-04-06"
+date: "2026-04-09"
 category: "life"
-excerpt: "Rhythms worth keeping and small moments worth saving."
+excerpt: "Guess i have to write sth"
 tags: ["life", "journal"]
 ---
 
-I've been walking 30 minutes every day—my head feels steadier for it.
+The finals are comming, i should probably go study MIE100 :\
 
-Today's list:
+A tiny formula from MIE, just to check my LaTex rendering:
 
-- Clear the bench
-- Write docs for an old project
-- Read one chapter on hardware design before bed
+$$\vec{a}B = \vec{a}A + \vec{a}{BA}^{\tau} + \vec{a}{BA}^{n}$$
 
-A tiny formula, just because:
-
-$$
-E = mc^2
-$$
+Acceleration between to points on rigid body (2D)
