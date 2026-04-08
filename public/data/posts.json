@@ -1,27 +1,27 @@
 [
   {
     "slug": "life-first",
-    "title": "最近的日常记录",
+    "title": "Recent days",
     "date": "2026-04-06",
-    "excerpt": "记录最近的生活节奏，以及一些值得保留的小瞬间。",
+    "excerpt": "Rhythms worth keeping and small moments worth saving.",
     "tags": [
-      "生活",
-      "日记"
+      "life",
+      "journal"
     ],
     "category": "life",
-    "content": "\r\n最近开始坚持每天散步 30 分钟，发现精神状态稳定很多。\r\n\r\n今天的待办：\r\n\r\n- 整理工作台\r\n- 给旧项目补文档\r\n- 晚上读一章硬件设计相关的书\r\n\r\n一个小公式，记录一下：\r\n\r\n$$\r\nE = mc^2\r\n$$\r\n"
+    "content": "\r\nI've been walking 30 minutes every day—my head feels steadier for it.\r\n\r\nToday's list:\r\n\r\n- Clear the bench\r\n- Write docs for an old project\r\n- Read one chapter on hardware design before bed\r\n\r\nA tiny formula, just because:\r\n\r\n$$\r\nE = mc^2\r\n$$\r\n"
   },
   {
     "slug": "electronics-first",
-    "title": "STM32 PWM 调光实验",
+    "title": "STM32 PWM dimming lab",
     "date": "2026-04-05",
-    "excerpt": "用定时器输出 PWM 控制 LED 亮度，并记录关键参数。",
+    "excerpt": "Timer PWM to drive an LED, with the key registers called out.",
     "tags": [
-      "电子",
+      "electronics",
       "STM32",
       "PWM"
     ],
     "category": "electronics",
-    "content": "\r\n这篇文章记录 PWM 调光的基础实验。\r\n\r\n核心代码：\r\n\r\n```c\r\nvoid pwm_set(uint16_t duty) {\r\n  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, duty);\r\n}\r\n```\r\n\r\n占空比计算公式：\r\n\r\n$$\r\nD = \\frac{T_{on}}{T} \\times 100\\%\r\n$$\r\n\r\n后续准备加入 ADC 反馈，实现闭环亮度控制。\r\n"
+    "content": "\r\nQuick lab notes on PWM dimming.\r\n\r\nCore helper:\r\n\r\n```c\r\nvoid pwm_set(uint16_t duty) {\r\n  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, duty);\r\n}\r\n```\r\n\r\nDuty cycle:\r\n\r\n$$\r\nD = \\frac{T_{on}}{T} \\times 100\\%\r\n$$\r\n\r\nNext: add ADC feedback for closed-loop brightness.\r\n"
   }
 ]

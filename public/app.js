@@ -48,7 +48,7 @@ function setView(view) {
 
 function enterBlogWithTheme(theme) {
   state.theme = theme;
-  // 先显示博客壳再渲染正文：KaTeX / 高亮在父级 display:none 时可能抛错，导致无法执行 setView
+  // Show blog shell before rendering: KaTeX / hljs can throw inside display:none
   setView("blog");
   requestAnimationFrame(() => {
     applyTheme();
@@ -61,19 +61,19 @@ function syncLandingThemeUI() {
   const isElec = state.theme === "electronics";
   landingThemePreview.setAttribute("aria-pressed", isElec ? "true" : "false");
   landingThemePreview.title = isElec
-    ? "预览亮色背景（不进入博客）"
-    : "预览暗色背景（不进入博客）";
-  landingThemeLabel.textContent = isElec ? "预览亮色" : "预览暗色";
+    ? "Preview light background (stay on home)"
+    : "Preview dark background (stay on home)";
+  landingThemeLabel.textContent = isElec ? "Light preview" : "Dark preview";
 }
 
 function applyTheme() {
   const isLife = state.theme === "life";
   document.body.setAttribute("data-theme", isLife ? "life" : "electronics");
-  modeToggle.textContent = isLife ? "切换到电子项目模式" : "切换到生活模式";
-  sidebarTitle.textContent = isLife ? "生活记录" : "电子项目";
+  modeToggle.textContent = isLife ? "Switch to electronics" : "Switch to life";
+  sidebarTitle.textContent = isLife ? "Life" : "Electronics";
   sidebarDesc.textContent = isLife
-    ? "亮色主题，记录日常。"
-    : "暗色主题，沉淀项目。";
+    ? "Light theme for everyday notes."
+    : "Dark theme for builds and math.";
   syncLandingThemeUI();
   if (state.view === "blog") {
     renderList();
@@ -81,7 +81,7 @@ function applyTheme() {
 }
 
 function categoryName(category) {
-  return category === "life" ? "生活" : "电子项目";
+  return category === "life" ? "Life" : "Electronics";
 }
 
 function renderList() {
@@ -90,7 +90,7 @@ function renderList() {
   postList.innerHTML = "";
 
   if (!filtered.length) {
-    postList.innerHTML = "<p class=\"empty-hint\">暂无文章</p>";
+    postList.innerHTML = "<p class=\"empty-hint\">No posts yet</p>";
     return;
   }
 
@@ -144,7 +144,7 @@ function renderPost(slug) {
       });
     }
   } catch (err) {
-    postBody.innerHTML = `<p class="render-error">渲染出错：${escapeHtml(String(err.message))}</p>`;
+    postBody.innerHTML = `<p class="render-error">Render error: ${escapeHtml(String(err.message))}</p>`;
   }
 }
 
@@ -190,5 +190,5 @@ async function init() {
 }
 
 init().catch((err) => {
-  postBody.textContent = `加载失败: ${err.message}`;
+  postBody.textContent = `Failed to load: ${err.message}`;
 });

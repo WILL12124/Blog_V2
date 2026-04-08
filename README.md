@@ -1,62 +1,58 @@
-# Personal Glass Blog on Cloudflare Workers
+# Personal glass blog (Cloudflare Workers)
 
-一个基于 Cloudflare Workers 的个人博客模板，支持：
+Static-first personal blog template:
 
-- 生活与电子项目双页面切换
-- 主题联动（生活亮色 / 电子项目暗色）
-- Glassmorphism 风格
-- Markdown 发文
-- 代码高亮（highlight.js）
-- LaTeX 渲染（KaTeX）
+- **Life** vs **electronics** sections with matching light/dark themes
+- Glassmorphism-style UI
+- Markdown posts, code highlighting (Highlight.js), LaTeX (KaTeX)
 
-## 1) 安装
+## 1) Install
 
 ```bash
 npm install
 ```
 
-## 2) 写文章
+## 2) Write posts
 
-在 `content/posts` 新建 `.md` 文件，示例：
+Add `.md` files under `content/posts`, for example:
 
 ```md
 ---
-title: "标题"
+title: "Title"
 date: "2026-04-07"
-category: "life" # life 或 electronics
-excerpt: "摘要"
-tags: ["标签1", "标签2"]
+category: "life" # life | electronics
+excerpt: "Short summary"
+tags: ["tag1", "tag2"]
 ---
 
-正文（支持 markdown / 代码块 / latex）
+Body (markdown, code fences, LaTeX)
 ```
 
-## 3) 构建内容
+## 3) Build the index
 
 ```bash
 npm run build:posts
 ```
 
-会生成 `public/data/posts.json`，部署后直接可访问。
+Writes `public/data/posts.json` for the site to load.
 
-## 4) 本地预览
+## 4) Local preview
 
 ```bash
 npm run dev
 ```
 
-## 5) 部署到 Cloudflare Worker
+## 5) Deploy (Worker)
 
-1. 登录 Cloudflare：
+1. Log in to Cloudflare:
    ```bash
    npx wrangler login
    ```
-2. 发布：
+2. Deploy:
    ```bash
    npm run deploy
    ```
 
-## 6) 绑定你的域名
+## 6) Custom domain
 
-在 Cloudflare 控制台 -> Workers -> 该服务 -> Triggers -> Custom Domains，
-绑定你已经托管在 Cloudflare 的域名即可。
+In Cloudflare: **Workers** → your worker → **Triggers** → **Custom Domains**, and attach the domain you already proxy on Cloudflare.

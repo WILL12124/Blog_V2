@@ -1,20 +1,20 @@
 ---
-title: "最近的日常记录"
+title: "Recent days"
 date: "2026-04-06"
 category: "life"
-excerpt: "记录最近的生活节奏，以及一些值得保留的小瞬间。"
-tags: ["生活", "日记"]
+excerpt: "Rhythms worth keeping and small moments worth saving."
+tags: ["life", "journal"]
 ---
 
-最近开始坚持每天散步 30 分钟，发现精神状态稳定很多。
+I've been walking 30 minutes every day—my head feels steadier for it.
 
-今天的待办：
+Today's list:
 
-- 整理工作台
-- 给旧项目补文档
-- 晚上读一章硬件设计相关的书
+- Clear the bench
+- Write docs for an old project
+- Read one chapter on hardware design before bed
 
-一个小公式，记录一下：
+A tiny formula, just because:
 
 $$
 E = mc^2
