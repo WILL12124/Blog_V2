@@ -1,7 +1,7 @@
 ---
 title: "Personal Website v2"
 date: "2026-04-08"
-category: "small project"
+category: "electronics"
 excerpt: "A Personal Website, my tinkering jouney starts here!"
 tags: ["web-development", "Cloudflare"]
 ---
