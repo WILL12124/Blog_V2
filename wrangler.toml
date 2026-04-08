@@ -1,4 +1,4 @@
-name = "personal-glass-blog"
+name = "blog-v2"
 main = "src/worker.js"
 compatibility_date = "2026-04-07"
 
