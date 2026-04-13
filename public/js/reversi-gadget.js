@@ -2,7 +2,6 @@ import {
   boardInit,
   createBoard26,
   isValid,
-  hasValidMove,
   placeDot,
   makeMove,
   countStones,
@@ -43,6 +42,7 @@ function renderPieces(root, board, n) {
     for (let c = 0; c < n; c++) {
       const cell = cells[i++];
       cell.innerHTML = "";
+      cell.classList.remove("reversi-cell--hint");
       const ch = board[r][c];
       if (ch === "B" || ch === "W") {
         const disc = el(
@@ -50,6 +50,21 @@ function renderPieces(root, board, n) {
           `reversi-disc reversi-disc--${ch === "B" ? "black" : "white"}`
         );
         cell.appendChild(disc);
+      }
+    }
+  }
+}
+
+function renderHints(root, board, n, player) {
+  const cells = root.querySelectorAll(".reversi-cell");
+  let i = 0;
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      const cell = cells[i++];
+      if (board[r][c] === "U" && isValid(board, n, r, c, player)) {
+        cell.classList.add("reversi-cell--hint");
+        const dot = el("span", "reversi-hint-dot");
+        cell.appendChild(dot);
       }
     }
   }
@@ -144,84 +159,54 @@ export function mountReversiGadget(container) {
     if (rc.row !== -1 && rc.col !== -1) {
       placeDot(board, n, rc.row, rc.col, botPlay);
       setStatus(
-        `Computer places ${botPlay} at ${String.fromCharCode(97 + rc.row)}${String.fromCharCode(97 + rc.col)}.`
+        `Bot places at ${String.fromCharCode(97 + rc.row)}${String.fromCharCode(97 + rc.col)}.`
       );
-    } else {
-      setStatus(`${botPlay} player has no valid move.`);
     }
     renderPieces(gridRoot, board, n);
   }
 
-  /** Top of C while (1): get moves; if both empty break; user phase; recalc; if both empty break; bot phase. */
+  // After bot moves, check if user can move. If not → game over.
   function loopTop() {
     if (gameOver) return;
-
-    let botMoves = availableMove(board, n, botPlay);
-    let userMoves = availableMove(board, n, userPlay);
-
-    if (botMoves.length === 0 && userMoves.length === 0) {
+    const userMoves = availableMove(board, n, userPlay);
+    if (userMoves.length === 0) {
       endGame();
       return;
     }
-
-    /* --- User's turn --- */
-    if (userMoves.length > 0) {
-      waitingUser = true;
-      setStatus(`Your turn — ${userPlay}. Click a legal square.`);
-      return;
-    }
-
-    waitingUser = false;
-    setStatus(`${userPlay} player has no valid move.`);
-
-    botMoves = availableMove(board, n, botPlay);
-    userMoves = availableMove(board, n, userPlay);
-
-    if (botMoves.length === 0 && userMoves.length === 0) {
-      endGame();
-      return;
-    }
-
-    runBotPhase();
+    waitingUser = true;
+    setStatus(`Your turn. Click a highlighted square.`);
+    renderHints(gridRoot, board, n, userPlay);
   }
 
   function runBotPhase() {
     if (gameOver) return;
     const botMoves = availableMove(board, n, botPlay);
-    if (botMoves.length > 0) {
-      syncToolbarDisabled(true);
-      setStatus("Bot is thinking…");
-      setTimeout(() => {
-        if (gameOver) return;
-        botMakeMove();
-        syncToolbarDisabled(false);
-        loopTop();
-      }, 30);
-    } else {
-      setStatus(`${botPlay} player has no valid move.`);
-      setTimeout(() => loopTop(), 0);
+    if (botMoves.length === 0) {
+      endGame();
+      return;
     }
+    syncToolbarDisabled(true);
+    setStatus("Bot is thinking…");
+    // requestAnimationFrame ensures the browser paints the user's move
+    // before the synchronous makeMove blocks the main thread
+    requestAnimationFrame(() => setTimeout(() => {
+      if (gameOver) return;
+      botMakeMove();
+      syncToolbarDisabled(false);
+      loopTop();
+    }, 0));
   }
 
   function onCell(r, c) {
     if (gameOver || !waitingUser || !gameStarted) return;
     if (!isValid(board, n, r, c, userPlay)) {
-      setStatus(`Not a legal move — try another square. (${userPlay}'s turn.)`);
+      setStatus(`Not a legal move — click a highlighted square.`);
       return;
     }
 
+    waitingUser = false;
     placeDot(board, n, r, c, userPlay);
     renderPieces(gridRoot, board, n);
-    waitingUser = false;
-
-    let botMoves = availableMove(board, n, botPlay);
-    let userMoves = availableMove(board, n, userPlay);
-
-    if (botMoves.length === 0 && userMoves.length === 0) {
-      endGame();
-      return;
-    }
-
     runBotPhase();
   }
 
@@ -245,16 +230,8 @@ export function mountReversiGadget(container) {
     gameStarted = true;
     startBtn.disabled = true;
 
-    /* C: If bot is Black, it moves first (outside the while loop). */
     if (botPlay === "B") {
-      syncToolbarDisabled(true);
-      setStatus("Bot is thinking…");
-      setTimeout(() => {
-        if (gameOver) return;
-        botMakeMove();
-        syncToolbarDisabled(false);
-        loopTop();
-      }, 30);
+      runBotPhase();
     } else {
       loopTop();
     }

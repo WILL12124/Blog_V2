@@ -796,6 +796,56 @@ body[data-theme="electronics"] .reversi-entry-cta {
   line-height: 1.5;
 }
 
+.reversi-rules {
+  margin-top: 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+.reversi-rules-toggle {
+  cursor: pointer;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--life-accent);
+  list-style: none;
+  user-select: none;
+}
+
+.reversi-rules-toggle::-webkit-details-marker { display: none; }
+
+.reversi-rules-toggle::before {
+  content: "▶ ";
+  font-size: 0.65rem;
+  vertical-align: middle;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+
+details.reversi-rules[open] .reversi-rules-toggle::before {
+  transform: rotate(90deg);
+}
+
+.reversi-rules-body {
+  padding: 0 1rem 0.9rem;
+  font-size: 0.84rem;
+  color: var(--life-muted);
+  line-height: 1.6;
+}
+
+.reversi-rules-body p { margin: 0 0 0.5rem; }
+
+.reversi-rules-body ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.reversi-rules-body li { margin-bottom: 0.3rem; }
+
 .reversi-page-mount {
   width: 100%;
 }
@@ -1005,6 +1055,26 @@ body[data-theme="electronics"] .reversi-board-grid {
 .reversi-disc--white {
   background: radial-gradient(circle at 30% 30%, #fff, #e2e8f0);
   border: 1px solid rgba(15, 23, 42, 0.2);
+}
+
+.reversi-cell--hint {
+  background: rgba(13, 148, 136, 0.12);
+}
+
+.reversi-hint-dot {
+  position: absolute;
+  inset: 30%;
+  border-radius: 50%;
+  background: rgba(13, 148, 136, 0.55);
+  pointer-events: none;
+}
+
+[data-theme="electronics"] .reversi-cell--hint {
+  background: rgba(34, 211, 238, 0.1);
+}
+
+[data-theme="electronics"] .reversi-hint-dot {
+  background: rgba(34, 211, 238, 0.5);
 }
 
 .landing-strip {

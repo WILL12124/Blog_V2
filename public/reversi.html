@@ -28,6 +28,19 @@
         <a href="/" class="reversi-back">← Back to home</a>
         <h1 class="reversi-page-title">Reversi</h1>
         <p class="reversi-page-lead">Play against the bot from the lab engine. It uses minimax with alpha-beta pruning and iterative deepening</p>
+        <details class="reversi-rules">
+          <summary class="reversi-rules-toggle">How to play</summary>
+          <div class="reversi-rules-body">
+            <p>Reversi (also called Othello) is played on a square grid, starting with two black and two white discs in the centre.</p>
+            <ul>
+              <li><strong>Black moves first.</strong> Players alternate turns placing one disc per turn.</li>
+              <li><strong>A move must capture.</strong> You can only place a disc where it brackets one or more of the opponent's discs in a straight line (horizontal, vertical, or diagonal), with your own disc at the other end.</li>
+              <li><strong>Flip captured discs.</strong> All opponent discs bracketed by your move are flipped to your colour.</li>
+              <li><strong>Valid moves are highlighted.</strong> Small dots mark every square you can legally play.</li>
+              <li><strong>Game ends</strong> when either player has no valid move. The player with the most discs wins.</li>
+            </ul>
+          </div>
+        </details>
       </header>
       <div id="reversiGadgetMount" class="reversi-page-mount"></div>
     </div>
