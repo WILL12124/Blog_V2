@@ -13,7 +13,10 @@ I genuinely found building something internet-related is cool and fun. I remembe
 Next: Refine the webpage and consider using Cloudflare Workers for small backend
 
 Special Thanks:
-Claude Sonnet 4.6
-Claude Opus 4.6
-Gemini 3.1 pro
+
+$$
+Claude Sonnet 4.6 \n
+Claude Opus 4.6 \n
+Gemini 3.1 pro \n
 Cursor
+$$
