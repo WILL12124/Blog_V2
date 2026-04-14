@@ -492,6 +492,64 @@ body[data-theme="electronics"] .card-enter:hover {
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
 }
 
+/* Reversi card — no card-level hover, only the CTA button lifts */
+.card-enter--reversi {
+  cursor: default;
+}
+
+.card-enter--reversi::before {
+  display: none;
+}
+
+.card-enter--reversi:hover {
+  transform: none;
+  box-shadow: var(--life-shadow);
+  border-color: var(--life-border);
+}
+
+body[data-theme="electronics"] .card-enter--reversi:hover {
+  box-shadow: var(--elec-shadow);
+  border-color: var(--elec-border);
+}
+
+.reversi-open-btn {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(13, 148, 136, 0.35);
+  background: var(--life-accent-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--life-accent);
+  text-decoration: none;
+  transition: transform 0.22s var(--ease-out), box-shadow 0.22s, background 0.22s, border-color 0.22s;
+}
+
+.reversi-open-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 22px rgba(13, 148, 136, 0.22);
+  background: rgba(13, 148, 136, 0.2);
+  border-color: rgba(13, 148, 136, 0.5);
+}
+
+body[data-theme="electronics"] .reversi-open-btn {
+  border-color: rgba(34, 211, 238, 0.4);
+  background: var(--elec-accent-soft);
+  color: var(--elec-accent);
+}
+
+body[data-theme="electronics"] .reversi-open-btn:hover {
+  box-shadow: 0 8px 22px rgba(34, 211, 238, 0.2);
+  background: rgba(34, 211, 238, 0.18);
+  border-color: rgba(34, 211, 238, 0.55);
+}
+
 .card-enter-top {
   display: flex;
   align-items: center;
@@ -1404,6 +1462,7 @@ body[data-theme="electronics"] .meta {
 }
 
 .markdown-body {
+  font-family: "Lora", "Noto Serif SC", "Songti SC", serif;
   font-size: 1.03rem;
   line-height: 1.78;
   max-width: 65ch;
@@ -1421,12 +1480,24 @@ body[data-theme="electronics"] .meta {
   margin: 0 0 1.05em;
 }
 
+.markdown-body h1,
 .markdown-body h2,
-.markdown-body h3 {
+.markdown-body h3,
+.markdown-body h4 {
   font-family: var(--font-display);
-  margin: 1.45em 0 0.55em;
   font-weight: 600;
   letter-spacing: -0.02em;
+}
+
+.markdown-body h1 {
+  margin: 1.6em 0 0.6em;
+  font-size: 1.55rem;
+  letter-spacing: -0.025em;
+}
+
+.markdown-body h2,
+.markdown-body h3 {
+  margin: 1.45em 0 0.55em;
 }
 
 .markdown-body h2 {

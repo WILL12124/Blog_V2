@@ -94,10 +94,11 @@ function renderList() {
     return;
   }
 
-  filtered.forEach((post) => {
+  filtered.forEach((post, index) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "post-card";
+    btn.className = "post-card reveal";
+    btn.style.setProperty("--d", `${index * 0.07}s`);
     btn.innerHTML = `
       <strong>${escapeHtml(post.title)}</strong>
       <span>${escapeHtml(post.excerpt || "")}</span>

@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Sora:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Lora:ital,wght@0,400;0,500;1,400&family=Sora:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
@@ -115,23 +115,24 @@
         </div>
 
         <aside class="landing-col landing-col--aside" aria-label="Gadgets">
-          <a href="/reversi.html" class="reversi-entry reveal" style="--d: 0.18s">
-            <div class="gadget-titlebar">
-              <span class="gadget-dots" aria-hidden="true">●●●</span>
-              <span class="gadget-title">Reversi</span>
-            </div>
-            <div class="reversi-entry-body">
-              <p class="reversi-entry-text">
-                Play Reversi against the site bot — 9th on the class leaderboard.
-              </p>
-              <span class="reversi-entry-cta">
-                Open game
-                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M5 12h14M13 6l6 6-6 6" />
+          <div class="card-enter card-enter--reversi reveal" style="--d: 0.18s">
+            <span class="card-enter-top">
+              <span class="card-enter-icon" aria-hidden="true">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                  <circle cx="12" cy="12" r="9" />
+                  <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none" />
                 </svg>
               </span>
-            </div>
-          </a>
+              <span class="card-enter-label">Reversi</span>
+            </span>
+            <span class="card-enter-hint">Board game · minimax AI · ranked 9th in class</span>
+            <a href="/reversi.html" class="reversi-open-btn">
+              Open game
+              <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
+          </div>
           <div class="bento bento--accent reveal" style="--d: 0.26s">
             <span class="bento-tag">Today</span>
             <p class="bento-quote">“Peninsula Ironbox is sooo good!!!”</p>
