@@ -38,11 +38,14 @@ function setView(view) {
   if (view === "blog") {
     blogShell.classList.remove("is-hidden");
     blogShell.removeAttribute("data-hidden");
-    history.replaceState(null, "", "#blog");
+    if (!location.hash.startsWith("#blog/")) {
+      history.replaceState(null, "", "#blog");
+    }
   } else {
     blogShell.classList.add("is-hidden");
     blogShell.setAttribute("data-hidden", "true");
     history.replaceState(null, "", location.pathname + location.search);
+    document.title = "WILL'S BLOG";
   }
 }
 
@@ -104,12 +107,18 @@ function renderList() {
       <span>${escapeHtml(post.excerpt || "")}</span>
       <span class="date">${escapeHtml(post.date)}</span>
     `;
-    btn.addEventListener("click", () => renderPost(post.slug));
+    btn.addEventListener("click", () => {
+      location.hash = `#blog/${post.slug}`;
+    });
     postList.appendChild(btn);
   });
 
   const hasCurrent = filtered.some((p) => p.slug === state.currentSlug);
-  if (!hasCurrent) renderPost(filtered[0].slug);
+  if (hasCurrent && state.currentSlug) {
+    renderPost(state.currentSlug);
+  } else {
+    renderPost(filtered[0].slug);
+  }
 }
 
 function escapeHtml(text) {
@@ -124,6 +133,9 @@ function renderPost(slug) {
   state.currentSlug = slug;
 
   postTitle.textContent = post.title;
+  document.title = `${post.title} | WILL'S BLOG`;
+  history.replaceState(null, "", `#blog/${slug}`);
+
   const tags = Array.isArray(post.tags) ? post.tags.join(", ") : "";
   postMeta.textContent = `${post.date} | ${categoryName(post.category)}${tags ? ` | ${tags}` : ""}`;
 
@@ -183,17 +195,47 @@ modeToggle.addEventListener("click", () => {
   applyTheme();
 });
 
-window.addEventListener("hashchange", () => {
-  if (location.hash === "#blog" && state.view !== "blog") {
-    enterBlogWithTheme(state.theme);
+function handleHashChange() {
+  if (location.hash.startsWith("#blog")) {
+    const slug = location.hash.split("/")[1];
+    let targetTheme = state.theme;
+    
+    if (slug) {
+      const post = state.posts.find(p => p.slug === slug);
+      if (post) {
+        targetTheme = post.category === "life" ? "life" : "electronics";
+        state.currentSlug = slug;
+      }
+    }
+    
+    if (state.view !== "blog" || state.theme !== targetTheme) {
+      enterBlogWithTheme(targetTheme);
+    } else {
+      if (slug) renderPost(slug);
+    }
+  } else if (location.hash === "" || location.hash === "#") {
+    if (state.view !== "landing") {
+      setView("landing");
+      document.title = "WILL'S BLOG";
+    }
   }
-});
+}
+
+window.addEventListener("hashchange", handleHashChange);
 
 async function init() {
   const res = await fetch("/data/posts.json");
   state.posts = await res.json();
 
-  if (location.hash === "#blog") {
+  if (location.hash.startsWith("#blog")) {
+    const slug = location.hash.split("/")[1];
+    if (slug) {
+      const post = state.posts.find(p => p.slug === slug);
+      if (post) {
+        state.theme = post.category === "life" ? "life" : "electronics";
+        state.currentSlug = slug;
+      }
+    }
     enterBlogWithTheme(state.theme);
   } else {
     applyTheme();
