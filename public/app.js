@@ -20,6 +20,8 @@ const postBody = document.getElementById("postBody");
 const yearEl = document.getElementById("year");
 const landingThemePreview = document.getElementById("landingThemePreview");
 const landingThemeLabel = document.getElementById("landingThemeLabel");
+const iconSun = document.getElementById("iconSun");
+const iconMoon = document.getElementById("iconMoon");
 
 if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
@@ -67,6 +69,8 @@ function syncLandingThemeUI() {
     ? "Preview light background (stay on home)"
     : "Preview dark background (stay on home)";
   landingThemeLabel.textContent = isElec ? "Light preview" : "Dark preview";
+  if (iconSun)  iconSun.style.display  = isElec ? "none" : "";
+  if (iconMoon) iconMoon.style.display = isElec ? "" : "none";
 }
 
 function applyTheme() {
