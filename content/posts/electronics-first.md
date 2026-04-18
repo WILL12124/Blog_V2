@@ -15,8 +15,10 @@ Next: Refine the webpage and consider using Cloudflare Workers for small backend
 Special Thanks:
 
 $$
-Claude Sonnet 4.6 \n
-Claude Opus 4.6 \n
-Gemini 3.1 pro \n
+\begin{aligned}
+Claude Sonnet 4.6 //
+Claude Opus 4.6 //
+Gemini 3.1 pro //
 Cursor
+\end{aligned}
 $$

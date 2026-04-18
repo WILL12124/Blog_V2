@@ -1565,6 +1565,14 @@ body[data-theme="electronics"] .markdown-body :not(pre) > code {
   background: rgba(148, 163, 184, 0.14);
 }
 
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  display: block;
+  margin: 1.5rem auto;
+}
+
 @media (max-width: 900px) {
   .header {
     grid-template-columns: 1fr;

@@ -128,7 +128,16 @@ function renderPost(slug) {
   postMeta.textContent = `${post.date} | ${categoryName(post.category)}${tags ? ` | ${tags}` : ""}`;
 
   try {
-    postBody.innerHTML = marked.parse(post.content);
+    // Extract math before Marked so it doesn't mangle _ as italic
+    const mathBlocks = [];
+    const protected_ = post.content
+      .replace(/\$\$[\s\S]*?\$\$/g, (m) => { mathBlocks.push(m); return `%%MATH${mathBlocks.length - 1}%%`; })
+      .replace(/\$[^\n$]+?\$/g,     (m) => { mathBlocks.push(m); return `%%MATH${mathBlocks.length - 1}%%`; });
+
+    let html = marked.parse(protected_);
+    mathBlocks.forEach((m, i) => { html = html.replace(`%%MATH${i}%%`, m); });
+
+    postBody.innerHTML = html;
     postBody.querySelectorAll("pre code").forEach((el) => {
       try {
         hljs.highlightElement(el);
@@ -141,7 +150,8 @@ function renderPost(slug) {
         delimiters: [
           { left: "$$", right: "$$", display: true },
           { left: "$", right: "$", display: false }
-        ]
+        ],
+        throwOnError: false
       });
     }
   } catch (err) {

@@ -9,19 +9,19 @@
       "journal"
     ],
     "category": "life",
-    "content": "\r\nThe finals are comming, i should probably go study MIE100 :\\\r\n\r\nA tiny formula from MIE, just to check my LaTex rendering:\r\n\r\n$$\\vec{a}B = \\vec{a}A + \\vec{a}{BA}^{\\tau} + \\vec{a}{BA}^{n}$$\r\n\r\nAcceleration between to points on rigid body (2D)\r\n"
+    "content": "\r\nThe finals are comming, i should probably go study MIE100 :\\\r\n\r\nA tiny formula from MIE, just to check my LaTex rendering:\r\n\r\n$$\\vec{a}_B = \\vec{a}_A + \\vec{\\alpha} \\times \\vec{r}_{B/A} + \\vec{\\omega} \\times (\\vec{\\omega} \\times \\vec{r}_{B/A})$$\r\n\r\nAcceleration between to points on rigid body (2D)\r\n"
   },
   {
     "slug": "reversi_bot",
-    "title": "Personal Website v2",
+    "title": "Reversi Bot",
     "date": "2026-04-08",
     "excerpt": "A reversi bot that I've built is now deplyed on site!",
     "tags": [
-      "web-development",
-      "Cloudflare"
+      "Reversi",
+      "AI bot"
     ],
     "category": "electronics",
-    "content": "\r\nIn our course APS105, we built reversi bots and played against each other. My reversi bot ranked 9th on the leader board. If you are interested, the same algorithm is playable on site.\r\n"
+    "content": "\r\n![alt text](/images/asset.HEIC)\r\nIn our course APS105, there is a \"bot competition\" that everyone builds a reversi bot and played against other's bot. My reversi bot ranked 9th out of 440 students on the leader board. If you are interested, the same algorithm is playable on site!\r\n\r\n**Algorithm**: It uses a Minimax algorithm with Alpha-Beta pruning to look several turns ahead and discard bad options. To allow more search in given time limit, it uses iterative deepening, meaning it digs as deep into the game tree as possible within a strict 0.93-second time limit.\r\n\r\n**Stratergy**: It prioritizes controlling the corners and keeping its move options open (mobility) rather than just grabbing the most pieces early on. It also shifts its logic as the game progresses.\r\n"
   },
   {
     "slug": "electronics-first",
@@ -33,6 +33,6 @@
       "Cloudflare"
     ],
     "category": "electronics",
-    "content": "\r\nFinally! after about 4 hours of chatting with ai, i made this static webpage run on Cloudflare Pages and deployed on my custom domain. I didn't realize the time and now it's 1:21am already, I'd probably go to bed after posting this.\r\n\r\nI genuinely found building something internet-related is cool and fun. I remember tonight i first started browsing building personal VPS stuffs, look where i am now at :). I found this edgetunnel thing that uses Cloudeflare to bypass the GFW. It made me remember my personal blog v1 (on Github Pages) and decided to bring it further.\r\n\r\nNext: Refine the webpage and consider using Cloudflare Workers for small backend\r\n\r\nSpecial Thanks:\r\n\r\n$$\r\nClaude Sonnet 4.6 \\n\r\nClaude Opus 4.6 \\n\r\nGemini 3.1 pro \\n\r\nCursor\r\n$$\r\n"
+    "content": "\r\nFinally! after about 4 hours of chatting with ai, i made this static webpage run on Cloudflare Pages and deployed on my custom domain. I didn't realize the time and now it's 1:21am already, I'd probably go to bed after posting this.\r\n\r\nI genuinely found building something internet-related is cool and fun. I remember tonight i first started browsing building personal VPS stuffs, look where i am now at :). I found this edgetunnel thing that uses Cloudeflare to bypass the GFW. It made me remember my personal blog v1 (on Github Pages) and decided to bring it further.\r\n\r\nNext: Refine the webpage and consider using Cloudflare Workers for small backend\r\n\r\nSpecial Thanks:\r\n\r\n$$\r\n\\begin{aligned}\r\nClaude Sonnet 4.6 //\r\nClaude Opus 4.6 //\r\nGemini 3.1 pro //\r\nCursor\r\n\\end{aligned}\r\n$$\r\n"
   }
 ]

@@ -10,6 +10,6 @@ The finals are comming, i should probably go study MIE100 :\
 
 A tiny formula from MIE, just to check my LaTex rendering:
 
-$$\vec{a}B = \vec{a}A + \vec{a}{BA}^{\tau} + \vec{a}{BA}^{n}$$
+$$\vec{a}_B = \vec{a}_A + \vec{\alpha} \times \vec{r}_{B/A} + \vec{\omega} \times (\vec{\omega} \times \vec{r}_{B/A})$$
 
 Acceleration between to points on rigid body (2D)
