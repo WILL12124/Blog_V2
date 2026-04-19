@@ -16,9 +16,9 @@ Special Thanks:
 
 $$
 \begin{aligned}
-Claude Sonnet 4.6 //
-Claude Opus 4.6 //
-Gemini 3.1 pro //
+Claude Sonnet 4.6 ||
+Claude Opus 4.6 ||
+Gemini 3.1 pro ||
 Cursor
 \end{aligned}
 $$

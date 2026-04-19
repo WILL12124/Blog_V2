@@ -1,6 +1,7 @@
 import {
   boardInit,
   createBoard26,
+  hasValidMove,
   isValid,
   placeDot,
   makeMove,
@@ -165,14 +166,30 @@ export function mountReversiGadget(container) {
     renderPieces(gridRoot, board, n);
   }
 
-  // After bot moves, check if user can move. If not → game over.
+  // After bot moves, check if user can move.
+  // If user can't move but bot can → skip user's turn (with message).
+  // Game ends only when NEITHER player can move.
   function loopTop() {
     if (gameOver) return;
-    const userMoves = availableMove(board, n, userPlay);
-    if (userMoves.length === 0) {
+    const userCanMove = hasValidMove(board, n, userPlay);
+    const botCanMove = hasValidMove(board, n, botPlay);
+
+    if (!userCanMove && !botCanMove) {
       endGame();
       return;
     }
+
+    if (!userCanMove) {
+      // User has no moves — show a message, wait 1 second, then bot plays again
+      setStatus(`You have no available moves — skipping your turn…`);
+      syncToolbarDisabled(true);
+      setTimeout(() => {
+        if (gameOver) return;
+        runBotPhase();
+      }, 1000);
+      return;
+    }
+
     waitingUser = true;
     setStatus(`Your turn. Click a highlighted square.`);
     renderHints(gridRoot, board, n, userPlay);
@@ -180,11 +197,26 @@ export function mountReversiGadget(container) {
 
   function runBotPhase() {
     if (gameOver) return;
-    const botMoves = availableMove(board, n, botPlay);
-    if (botMoves.length === 0) {
+    const botCanMove = hasValidMove(board, n, botPlay);
+    const userCanMove = hasValidMove(board, n, userPlay);
+
+    if (!botCanMove && !userCanMove) {
       endGame();
       return;
     }
+
+    if (!botCanMove) {
+      // Bot has no moves — show a message, wait 1 second, then user plays
+      setStatus(`Bot has no available moves — skipping bot's turn…`);
+      syncToolbarDisabled(true);
+      setTimeout(() => {
+        if (gameOver) return;
+        syncToolbarDisabled(false);
+        loopTop();
+      }, 1000);
+      return;
+    }
+
     syncToolbarDisabled(true);
     setStatus("Bot is thinking…");
     // requestAnimationFrame ensures the browser paints the user's move
