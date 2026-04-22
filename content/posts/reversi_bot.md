@@ -1,6 +1,6 @@
 ---
 title: "Reversi Bot"
-date: "2026-04-08"
+date: "2026-04-18"
 category: "electronics"
 excerpt: "A reversi bot that I've built is now deplyed on site!"
 tags: ["Reversi", "AI bot"]

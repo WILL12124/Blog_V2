@@ -1,6 +1,6 @@
 ---
 title: "Edgetunnel"
-date: "2026-04-08"
+date: "2026-04-22"
 category: "electronics"
 excerpt: "A project enabling internet access in restricted regions using Cloudflare"
 tags: ["opensource", "Cloudflare", "GFW"]
