@@ -28,6 +28,38 @@ First-time deploy requires `npx wrangler login` before `npm run deploy`.
 - `scripts/build-posts.mjs` — post compiler; always run before serving/deploying
 - `public/data/posts.json` — generated artifact; do not edit by hand
 
+
+## API Routes
+
+The worker exposes dynamic API endpoints under `/api/`:
+
+| Route | Method | Description |
+|---|---|---|
+| `/api/health` | GET | Health check; returns `{ ok, postCount }` |
+| `/api/posts` | GET | Post list with optional query params |
+| `/api/posts/:slug` | GET | Single post with full content + likes |
+| `/api/posts/:slug/likes` | GET | Get like count for a post |
+| `/api/posts/:slug/like` | POST | Increment like count, returns `{ slug, likes }` |
+
+**`/api/posts` query parameters:**
+- `category` — filter by `"life"` or `"electronics"`
+- `limit` — max number of results (default: all)
+- `offset` — skip N results (default: 0)
+- `fields=full` — include post body content (default: metadata only)
+
+Response shape: `{ posts: [...], total, offset, limit }` — each post includes a `likes` field.
+
+## D1 Database (Likes)
+
+Likes are stored in a Cloudflare D1 database (`blog-likes`) with a `post_likes` table. The table is auto-created on first request.
+
+**First-time production deploy:**
+1. `npx wrangler d1 create blog-likes` — creates the database
+2. Copy the output `database_id` into `wrangler.toml`
+3. `npx wrangler d1 execute blog-likes --remote --file=./migrations/0001_create_likes.sql` — run migration
+
+Local dev uses a local SQLite file automatically; no setup needed.
+
 ## Content
 
 Posts are Markdown files in `content/posts/` with this frontmatter:

@@ -22,6 +22,9 @@ const landingThemePreview = document.getElementById("landingThemePreview");
 const landingThemeLabel = document.getElementById("landingThemeLabel");
 const iconSun = document.getElementById("iconSun");
 const iconMoon = document.getElementById("iconMoon");
+const likeRow = document.getElementById("likeRow");
+const likeBtn = document.getElementById("likeBtn");
+const likeCount = document.getElementById("likeCount");
 
 if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
@@ -131,6 +134,80 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// ---------------------------------------------------------------------------
+// Likes helpers
+// ---------------------------------------------------------------------------
+const LIKED_KEY = "blog_liked_posts";
+
+function getLikedSlugs() {
+  try {
+    return JSON.parse(localStorage.getItem(LIKED_KEY) || "[]");
+  } catch { return []; }
+}
+
+function markAsLiked(slug) {
+  const liked = getLikedSlugs();
+  if (!liked.includes(slug)) {
+    liked.push(slug);
+    localStorage.setItem(LIKED_KEY, JSON.stringify(liked));
+  }
+}
+
+function hasLiked(slug) {
+  return getLikedSlugs().includes(slug);
+}
+
+/** Update the like button UI for the current post */
+function updateLikeUI(slug, likes) {
+  likeRow.style.display = "";
+  likeCount.textContent = String(likes);
+  const liked = hasLiked(slug);
+  likeBtn.classList.toggle("is-liked", liked);
+  likeBtn.disabled = liked;
+  likeBtn.title = liked ? "You liked this post" : "Like this post";
+}
+
+/** Fetch likes from API and update UI */
+async function fetchLikes(slug) {
+  try {
+    const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/likes`);
+    if (!res.ok) return;
+    const data = await res.json();
+    updateLikeUI(slug, data.likes);
+  } catch { /* silent */ }
+}
+
+/** Handle like button click */
+async function handleLike() {
+  const slug = state.currentSlug;
+  if (!slug || hasLiked(slug)) return;
+
+  // Optimistic UI
+  likeBtn.classList.add("is-liked", "like-pop");
+  likeBtn.disabled = true;
+  const current = parseInt(likeCount.textContent, 10) || 0;
+  likeCount.textContent = String(current + 1);
+  markAsLiked(slug);
+
+  // Remove pop animation class after it finishes
+  setTimeout(() => likeBtn.classList.remove("like-pop"), 500);
+
+  try {
+    const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/like`, {
+      method: "POST",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      likeCount.textContent = String(data.likes);
+    }
+  } catch { /* optimistic count stands */ }
+}
+
+likeBtn.addEventListener("click", handleLike);
+
+// ---------------------------------------------------------------------------
+// Render a single post
+// ---------------------------------------------------------------------------
 function renderPost(slug) {
   const post = state.posts.find((p) => p.slug === slug);
   if (!post) return;
@@ -142,6 +219,10 @@ function renderPost(slug) {
 
   const tags = Array.isArray(post.tags) ? post.tags.join(", ") : "";
   postMeta.textContent = `${post.date} | ${categoryName(post.category)}${tags ? ` | ${tags}` : ""}`;
+
+  // Show initial like count from list data, then refresh from API
+  updateLikeUI(slug, post.likes || 0);
+  fetchLikes(slug);
 
   try {
     // Extract math before Marked so it doesn't mangle _ as italic
@@ -228,8 +309,9 @@ function handleHashChange() {
 window.addEventListener("hashchange", handleHashChange);
 
 async function init() {
-  const res = await fetch("/data/posts.json");
-  state.posts = await res.json();
+  const res = await fetch("/api/posts?fields=full");
+  const data = await res.json();
+  state.posts = data.posts;
 
   if (location.hash.startsWith("#blog")) {
     const slug = location.hash.split("/")[1];

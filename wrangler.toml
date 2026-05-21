@@ -5,3 +5,8 @@ compatibility_date = "2026-04-07"
 [assets]
 directory = "./public"
 binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "blog-likes"
+database_id = "ba74aafc-5a7e-4f5c-a1c4-bc14c9e1eedd"

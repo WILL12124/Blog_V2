@@ -1599,3 +1599,114 @@ body[data-theme="electronics"] .markdown-body :not(pre) > code {
     grid-template-columns: 1fr;
   }
 }
+
+/* Like button */
+.like-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.like-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px 8px 14px;
+  border: 1px solid rgba(120, 113, 108, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--life-muted);
+  transition: transform 0.22s var(--ease-out),
+              border-color 0.22s,
+              box-shadow 0.22s,
+              color 0.22s,
+              background 0.22s;
+}
+
+.like-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.like-btn:hover:not(:disabled) .like-icon {
+  fill: rgba(239, 68, 68, 0.15);
+  stroke: #ef4444;
+}
+
+.like-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  transition: fill 0.22s, stroke 0.22s, transform 0.22s var(--ease-out);
+}
+
+/* Liked state */
+.like-btn.is-liked {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  cursor: default;
+}
+
+.like-btn.is-liked .like-icon {
+  fill: #ef4444;
+  stroke: #ef4444;
+}
+
+/* Pop animation on click */
+.like-btn.like-pop .like-icon {
+  animation: likePop 0.45s var(--ease-out);
+}
+
+@keyframes likePop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.35); }
+  60% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+.like-count {
+  font-variant-numeric: tabular-nums;
+  min-width: 1.2em;
+  text-align: center;
+}
+
+/* Electronics theme */
+body[data-theme="electronics"] .like-btn {
+  background: rgba(15, 23, 42, 0.65);
+  border-color: var(--elec-border);
+  color: var(--elec-muted);
+}
+
+body[data-theme="electronics"] .like-btn:hover:not(:disabled) {
+  border-color: rgba(251, 113, 133, 0.5);
+  box-shadow: 0 8px 24px rgba(251, 113, 133, 0.15);
+  color: #fb7185;
+}
+
+body[data-theme="electronics"] .like-btn:hover:not(:disabled) .like-icon {
+  fill: rgba(251, 113, 133, 0.15);
+  stroke: #fb7185;
+}
+
+body[data-theme="electronics"] .like-btn.is-liked {
+  color: #fb7185;
+  border-color: rgba(251, 113, 133, 0.4);
+  background: rgba(251, 113, 133, 0.1);
+}
+
+body[data-theme="electronics"] .like-btn.is-liked .like-icon {
+  fill: #fb7185;
+  stroke: #fb7185;
+}
