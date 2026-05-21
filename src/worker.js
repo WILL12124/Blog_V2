@@ -16,6 +16,11 @@ const JSON_HEADERS = {
   "cache-control": "public, max-age=60",
 };
 
+const JSON_HEADERS_NO_CACHE = {
+  "content-type": "application/json; charset=utf-8",
+  "cache-control": "no-store",
+};
+
 /** Respond with JSON */
 function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
@@ -181,7 +186,10 @@ async function handlePostList(url, env) {
     return out;
   });
 
-  return json({ posts: items, total, offset, limit: limit || total });
+  return new Response(JSON.stringify({ posts: items, total, offset, limit: limit || total }), {
+    status: 200,
+    headers: JSON_HEADERS_NO_CACHE,
+  });
 }
 
 /** GET /api/posts/:slug */
@@ -198,7 +206,10 @@ async function handlePostBySlug(slug, env) {
 /** GET /api/posts/:slug/likes */
 async function handleGetLikes(slug, env) {
   const likes = await getLikes(env.DB, slug);
-  return json({ slug, likes });
+  return new Response(JSON.stringify({ slug, likes }), {
+    status: 200,
+    headers: JSON_HEADERS_NO_CACHE,
+  });
 }
 
 /** POST /api/posts/:slug/like */

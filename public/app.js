@@ -175,7 +175,7 @@ function updateLikeUI(slug, likes) {
 /** Fetch likes from API and update UI */
 async function fetchLikes(slug) {
   try {
-    const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/likes`);
+    const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/likes`, { cache: "no-store" });
     if (!res.ok) return;
     const data = await res.json();
     updateLikeUI(slug, data.likes);
