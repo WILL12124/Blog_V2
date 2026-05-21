@@ -153,6 +153,11 @@ function markAsLiked(slug) {
   }
 }
 
+function unmarkAsLiked(slug) {
+  const liked = getLikedSlugs().filter((s) => s !== slug);
+  localStorage.setItem(LIKED_KEY, JSON.stringify(liked));
+}
+
 function hasLiked(slug) {
   return getLikedSlugs().includes(slug);
 }
@@ -163,8 +168,8 @@ function updateLikeUI(slug, likes) {
   likeCount.textContent = String(likes);
   const liked = hasLiked(slug);
   likeBtn.classList.toggle("is-liked", liked);
-  likeBtn.disabled = liked;
-  likeBtn.title = liked ? "You liked this post" : "Like this post";
+  likeBtn.disabled = false;
+  likeBtn.title = liked ? "Unlike this post" : "Like this post";
 }
 
 /** Fetch likes from API and update UI */
@@ -177,30 +182,62 @@ async function fetchLikes(slug) {
   } catch { /* silent */ }
 }
 
-/** Handle like button click */
+/** Handle like/unlike button click */
 async function handleLike() {
   const slug = state.currentSlug;
-  if (!slug || hasLiked(slug)) return;
+  if (!slug) return;
 
-  // Optimistic UI
-  likeBtn.classList.add("is-liked", "like-pop");
-  likeBtn.disabled = true;
+  const alreadyLiked = hasLiked(slug);
   const current = parseInt(likeCount.textContent, 10) || 0;
-  likeCount.textContent = String(current + 1);
-  markAsLiked(slug);
 
-  // Remove pop animation class after it finishes
-  setTimeout(() => likeBtn.classList.remove("like-pop"), 500);
+  if (alreadyLiked) {
+    // --- Unlike (optimistic) ---
+    unmarkAsLiked(slug);
+    likeBtn.classList.remove("is-liked");
+    likeBtn.title = "Like this post";
+    const newCount = Math.max(0, current - 1);
+    likeCount.textContent = String(newCount);
+    updatePostCache(slug, newCount);
 
-  try {
-    const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/like`, {
-      method: "POST",
-    });
-    if (res.ok) {
-      const data = await res.json();
-      likeCount.textContent = String(data.likes);
-    }
-  } catch { /* optimistic count stands */ }
+    try {
+      const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/unlike`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        likeCount.textContent = String(data.likes);
+        updatePostCache(slug, data.likes);
+      }
+    } catch { /* optimistic count stands */ }
+  } else {
+    // --- Like (optimistic) ---
+    markAsLiked(slug);
+    likeBtn.classList.add("is-liked", "like-pop");
+    likeBtn.title = "Unlike this post";
+    const newCount = current + 1;
+    likeCount.textContent = String(newCount);
+    updatePostCache(slug, newCount);
+
+    // Remove pop animation class after it finishes
+    setTimeout(() => likeBtn.classList.remove("like-pop"), 500);
+
+    try {
+      const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/like`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        likeCount.textContent = String(data.likes);
+        updatePostCache(slug, data.likes);
+      }
+    } catch { /* optimistic count stands */ }
+  }
+}
+
+/** Keep state.posts in sync so navigating back shows current count */
+function updatePostCache(slug, likes) {
+  const post = state.posts.find((p) => p.slug === slug);
+  if (post) post.likes = likes;
 }
 
 likeBtn.addEventListener("click", handleLike);

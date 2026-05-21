@@ -7,6 +7,7 @@
 //   GET  /api/posts/:slug         → single post with full content + likes
 //   GET  /api/posts/:slug/likes   → { slug, likes }
 //   POST /api/posts/:slug/like    → increment like, returns { slug, likes }
+//   POST /api/posts/:slug/unlike  → decrement like (floor 0), returns { slug, likes }
 //   *    everything else          → static assets via ASSETS binding
 // ---------------------------------------------------------------------------
 
@@ -113,6 +114,23 @@ async function incrementLike(db, slug) {
   return row ? row.likes : 1;
 }
 
+/** Decrement likes for a slug (floor 0), return new count */
+async function decrementLike(db, slug) {
+  await ensureDB(db);
+  await db
+    .prepare(
+      `INSERT INTO post_likes (slug, likes) VALUES (?, 0)
+       ON CONFLICT(slug) DO UPDATE SET likes = MAX(likes - 1, 0)`
+    )
+    .bind(slug)
+    .run();
+  const row = await db
+    .prepare("SELECT likes FROM post_likes WHERE slug = ?")
+    .bind(slug)
+    .first();
+  return row ? row.likes : 0;
+}
+
 // ---------------------------------------------------------------------------
 // Route handlers
 // ---------------------------------------------------------------------------
@@ -200,6 +218,23 @@ async function handleLike(slug, env) {
   );
 }
 
+/** POST /api/posts/:slug/unlike */
+async function handleUnlike(slug, env) {
+  // Verify the post exists
+  const posts = await loadPosts(env);
+  const post = posts.find((p) => p.slug === slug);
+  if (!post) {
+    return json({ error: "Post not found" }, 404);
+  }
+
+  const likes = await decrementLike(env.DB, slug);
+  return json(
+    { slug, likes },
+    200,
+    { "cache-control": "no-store" }
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Main fetch handler
 // ---------------------------------------------------------------------------
@@ -239,6 +274,13 @@ export default {
         if (likeMatch) {
           if (method !== "POST") return json({ error: "Method not allowed" }, 405);
           return await handleLike(likeMatch.slug, env);
+        }
+
+        // /api/posts/:slug/unlike  (POST)
+        const unlikeMatch = matchRoute("/api/posts/:slug/unlike", pathname);
+        if (unlikeMatch) {
+          if (method !== "POST") return json({ error: "Method not allowed" }, 405);
+          return await handleUnlike(unlikeMatch.slug, env);
         }
 
         // /api/posts/:slug/likes (GET)
