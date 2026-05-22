@@ -172,6 +172,7 @@
     </section>
 
     <div id="blogShell" class="blog-shell is-hidden" data-hidden="true">
+      <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
       <header class="glass header">
         <button type="button" class="nav-back" id="backHome" title="Back to home">
           <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -182,7 +183,18 @@
         <div class="brand-wrap">
           <span class="brand">WILL'S BLOG</span>
         </div>
-        <div class="header-actions">
+      <div class="header-actions">
+          <button
+            type="button"
+            class="nav-drawer-toggle"
+            id="drawerToggle"
+            aria-label="Browse posts"
+            title="Browse posts"
+          >
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+          </button>
           <button id="modeToggle" class="toggle-btn" type="button">
             Switch to electronics
           </button>
@@ -190,7 +202,18 @@
       </header>
 
       <main class="layout">
-        <aside class="glass sidebar">
+        <aside class="glass sidebar" id="blogSidebar">
+          <button
+            type="button"
+            class="sidebar-close"
+            id="sidebarClose"
+            aria-label="Close post list"
+            title="Close"
+          >
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
           <h2 id="sidebarTitle">Life</h2>
           <p id="sidebarDesc">Light theme for everyday notes.</p>
           <div id="postList" class="post-list"></div>

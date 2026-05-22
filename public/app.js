@@ -25,6 +25,10 @@ const iconMoon = document.getElementById("iconMoon");
 const likeRow = document.getElementById("likeRow");
 const likeBtn = document.getElementById("likeBtn");
 const likeCount = document.getElementById("likeCount");
+const drawerToggle = document.getElementById("drawerToggle");
+const sidebarClose = document.getElementById("sidebarClose");
+const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+const blogSidebar = document.getElementById("blogSidebar");
 
 if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
@@ -108,6 +112,7 @@ function renderList() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "post-card reveal";
+    btn.dataset.slug = post.slug;
     btn.style.setProperty("--d", `${index * 0.07}s`);
     btn.innerHTML = `
       <strong>${escapeHtml(post.title)}</strong>
@@ -116,6 +121,7 @@ function renderList() {
     `;
     btn.addEventListener("click", () => {
       location.hash = `#blog/${post.slug}`;
+      closeSidebar();
     });
     postList.appendChild(btn);
   });
@@ -243,12 +249,38 @@ function updatePostCache(slug, likes) {
 likeBtn.addEventListener("click", handleLike);
 
 // ---------------------------------------------------------------------------
+// Drawer (mobile sidebar) helpers
+// ---------------------------------------------------------------------------
+function openSidebar() {
+  if (!blogSidebar) return;
+  blogSidebar.classList.add("is-open");
+  sidebarBackdrop.classList.add("is-visible");
+  document.body.style.overflow = "hidden";
+}
+
+function closeSidebar() {
+  if (!blogSidebar) return;
+  blogSidebar.classList.remove("is-open");
+  sidebarBackdrop.classList.remove("is-visible");
+  document.body.style.overflow = "";
+}
+
+drawerToggle?.addEventListener("click", openSidebar);
+sidebarClose?.addEventListener("click", closeSidebar);
+sidebarBackdrop?.addEventListener("click", closeSidebar);
+
+// ---------------------------------------------------------------------------
 // Render a single post
 // ---------------------------------------------------------------------------
 function renderPost(slug) {
   const post = state.posts.find((p) => p.slug === slug);
   if (!post) return;
   state.currentSlug = slug;
+
+  // Highlight the active post card in the sidebar
+  document.querySelectorAll(".post-card").forEach((card) => {
+    card.classList.toggle("is-active", card.dataset.slug === slug);
+  });
 
   postTitle.textContent = post.title;
   document.title = `${post.title} | WILL'S BLOG`;

@@ -1293,6 +1293,9 @@ body[data-theme="electronics"] .nav-back:hover {
 
 .header-actions {
   justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .toggle-btn {
@@ -1335,11 +1338,17 @@ body[data-theme="electronics"] .toggle-btn {
 }
 
 .content-inner {
-  padding: 26px 28px 32px;
+  padding: 32px clamp(28px, 5%, 64px) 52px;
 }
 
 .sidebar {
   padding: 22px 20px 24px;
+  position: sticky;
+  top: 100px;
+  max-height: calc(100vh - 120px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar h2 {
@@ -1365,6 +1374,10 @@ body[data-theme="electronics"] .sidebar > p {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 8px;
 }
 
 .render-error {
@@ -1437,6 +1450,19 @@ body[data-theme="electronics"] .post-card:hover {
   margin-top: 10px;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
+}
+
+/* Active (currently reading) card */
+.post-card.is-active {
+  border-color: var(--life-accent);
+  background: var(--life-accent-soft);
+  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.12);
+}
+
+body[data-theme="electronics"] .post-card.is-active {
+  border-color: var(--elec-accent);
+  background: var(--elec-accent-soft);
+  box-shadow: 0 4px 16px rgba(34, 211, 238, 0.12);
 }
 
 .content h1 {
@@ -1574,29 +1600,57 @@ body[data-theme="electronics"] .markdown-body :not(pre) > code {
 }
 
 @media (max-width: 900px) {
+  /* Simplified 3-col header: ← | TITLE | ☰ */
   .header {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    text-align: center;
-    gap: 12px;
+    padding: 12px 16px;
+    margin: 12px auto 14px;
   }
 
-  .nav-back {
-    justify-self: center;
-    order: 1;
+  .toggle-btn {
+    display: none;
   }
 
-  .brand-wrap {
-    order: 0;
+  .nav-drawer-toggle {
+    display: flex;
   }
 
-  .header-actions {
-    order: 2;
-    justify-self: center;
-  }
-
+  /* Main layout: single column (sidebar is drawn outside flow) */
   .layout {
     grid-template-columns: 1fr;
+  }
+
+  /* Sidebar becomes a fixed slide-in drawer */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    width: min(300px, 85vw);
+    max-height: 100vh;
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    padding: 28px 20px 32px;
+    transform: translateX(-105%);
+    transition: transform 0.32s var(--ease-out);
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-close {
+    display: flex;
+  }
+
+  /* Reset inner post-list scroll — drawer itself scrolls on mobile */
+  .post-list {
+    overflow-y: visible;
+    flex: none;
+    min-height: unset;
   }
 }
 
@@ -1709,4 +1763,100 @@ body[data-theme="electronics"] .like-btn.is-liked {
 body[data-theme="electronics"] .like-btn.is-liked .like-icon {
   fill: #fb7185;
   stroke: #fb7185;
+}
+
+/* ── Drawer toggle (hamburger) — hidden on desktop, shown on mobile ── */
+.nav-drawer-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--life-muted);
+  transition: color 0.2s, background 0.2s;
+}
+
+.nav-drawer-toggle:hover {
+  color: var(--life-accent);
+  background: var(--life-accent-soft);
+}
+
+body[data-theme="electronics"] .nav-drawer-toggle {
+  color: var(--elec-muted);
+}
+
+body[data-theme="electronics"] .nav-drawer-toggle:hover {
+  color: var(--elec-accent);
+  background: var(--elec-accent-soft);
+}
+
+/* ── Sidebar close button — hidden on desktop ── */
+.sidebar-close {
+  display: none;
+  align-self: flex-end;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--life-muted);
+  transition: color 0.2s, background 0.2s;
+  margin-bottom: 12px;
+}
+
+.sidebar-close:hover {
+  color: var(--life-accent);
+  background: var(--life-accent-soft);
+}
+
+body[data-theme="electronics"] .sidebar-close {
+  color: var(--elec-muted);
+}
+
+body[data-theme="electronics"] .sidebar-close:hover {
+  color: var(--elec-accent);
+  background: var(--elec-accent-soft);
+}
+
+/* ── Backdrop overlay ── */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-out);
+}
+
+.sidebar-backdrop.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Subtle scrollbar for post list ── */
+.post-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.post-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.post-list::-webkit-scrollbar-thumb {
+  background: rgba(120, 113, 108, 0.22);
+  border-radius: 4px;
+}
+
+body[data-theme="electronics"] .post-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.22);
 }
