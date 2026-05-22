@@ -78,6 +78,9 @@ A serverless SQL database deployed at the edge. Supports complex queries and ful
 
 A serverless object storage service with **zero egress fees**. Ideal for storing large files such as images, videos, and backups — without worrying about bandwidth costs.
 
+![alt text](/images/image_manager.png)
+In my blogposts, i used R2 to store all images. This is the upload page i created.
+
 #### Wrangler — CLI Tool
 
 A command-line tool for building, testing, and deploying applications to Cloudflare. Handles local development, environment management, and production deploys all in one.
