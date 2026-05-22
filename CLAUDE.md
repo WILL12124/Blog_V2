@@ -40,6 +40,12 @@ The worker exposes dynamic API endpoints under `/api/`:
 | `/api/posts/:slug` | GET | Single post with full content + likes |
 | `/api/posts/:slug/likes` | GET | Get like count for a post |
 | `/api/posts/:slug/like` | POST | Increment like count, returns `{ slug, likes }` |
+| `/api/posts/:slug/unlike` | POST | Decrement like count (floor 0), returns `{ slug, likes }` |
+| `/images/:key` | GET | Serve image from R2 (public, cached 24h) |
+| `/api/images` | GET | List all R2 images — **auth required** |
+| `/api/images` | POST | Upload image (multipart/form-data) — **auth required** |
+| `/api/images/:key` | DELETE | Delete an image from R2 — **auth required** |
+| `/api/images/:key/info` | GET | Image metadata — **auth required** |
 
 **`/api/posts` query parameters:**
 - `category` — filter by `"life"` or `"electronics"`
@@ -59,6 +65,32 @@ Likes are stored in a Cloudflare D1 database (`blog-likes`) with a `post_likes` 
 3. `npx wrangler d1 execute blog-likes --remote --file=./migrations/0001_create_likes.sql` — run migration
 
 Local dev uses a local SQLite file automatically; no setup needed.
+
+## R2 Image Storage
+
+Images are stored in a Cloudflare R2 bucket (`blog-images`) and served via the worker at `/images/:key`.
+
+**First-time setup:**
+1. Enable R2 in the Cloudflare Dashboard (Storage & Databases → R2)
+2. `npx wrangler r2 bucket create blog-images` — creates the bucket
+3. `npx wrangler secret put IMAGES_SECRET` — set a strong secret token for the admin API
+
+**Admin panel:** `/admin.html` — drag-and-drop upload, gallery view, one-click markdown copy, delete.
+
+**Auth:** All `/api/images` routes require `Authorization: Bearer <IMAGES_SECRET>` header.
+The admin panel stores the token in sessionStorage (cleared when the tab closes).
+
+**Referencing images in posts:**
+```markdown
+![Description](/images/filename.jpg)
+```
+The worker proxies this from R2 with `Cache-Control: public, max-age=86400`.
+
+**Uploading via CLI (alternative to admin UI):**
+```bash
+npx wrangler r2 object put blog-images/filename.jpg --file=./path/to/file.jpg
+```
+
 
 ## Content
 

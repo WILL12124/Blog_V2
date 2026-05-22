@@ -10,3 +10,7 @@ binding = "ASSETS"
 binding = "DB"
 database_name = "blog-likes"
 database_id = "ba74aafc-5a7e-4f5c-a1c4-bc14c9e1eedd"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "blog-images"

@@ -8,6 +8,13 @@
 //   GET  /api/posts/:slug/likes   → { slug, likes }
 //   POST /api/posts/:slug/like    → increment like, returns { slug, likes }
 //   POST /api/posts/:slug/unlike  → decrement like (floor 0), returns { slug, likes }
+//
+//   GET  /images/:key             → serve image from R2 (public)
+//   GET  /api/images              → list all images  [auth required]
+//   POST /api/images              → upload image     [auth required]
+//   GET  /api/images/:key/info    → image metadata   [auth required]
+//   DELETE /api/images/:key       → delete image     [auth required]
+//
 //   *    everything else          → static assets via ASSETS binding
 // ---------------------------------------------------------------------------
 
@@ -21,11 +28,38 @@ const JSON_HEADERS_NO_CACHE = {
   "cache-control": "no-store",
 };
 
+const CORS_HEADERS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET, POST, DELETE, OPTIONS",
+  "access-control-allow-headers": "Content-Type, Authorization",
+};
+
+// Allowed image MIME types
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  "image/avif",
+  "image/heic",
+  "image/heif",
+]);
+
 /** Respond with JSON */
 function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,
     headers: { ...JSON_HEADERS, ...extraHeaders },
+  });
+}
+
+/** Respond with JSON (no-cache) */
+function jsonNoCache(data, status = 200, extraHeaders = {}) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...JSON_HEADERS_NO_CACHE, ...extraHeaders },
   });
 }
 
@@ -44,6 +78,16 @@ function matchRoute(pattern, pathname) {
     }
   }
   return params;
+}
+
+// ---------------------------------------------------------------------------
+// Auth helper — checks "Authorization: Bearer <secret>" header
+// ---------------------------------------------------------------------------
+function isAuthorized(request, env) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const secret = env.IMAGES_SECRET;
+  if (!secret) return false; // secret must be configured
+  return authHeader === `Bearer ${secret}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -137,7 +181,7 @@ async function decrementLike(db, slug) {
 }
 
 // ---------------------------------------------------------------------------
-// Route handlers
+// Route handlers — Posts
 // ---------------------------------------------------------------------------
 
 /** GET /api/health */
@@ -247,6 +291,140 @@ async function handleUnlike(slug, env) {
 }
 
 // ---------------------------------------------------------------------------
+// Route handlers — R2 Image Storage
+// ---------------------------------------------------------------------------
+
+/**
+ * GET /images/:key
+ * Public route — serves an image from R2 with caching headers.
+ */
+async function handleServeImage(key, request, env) {
+  const object = await env.IMAGES.get(key);
+
+  if (!object) {
+    return new Response("Image not found", { status: 404 });
+  }
+
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set("etag", object.httpEtag);
+  headers.set("cache-control", "public, max-age=86400, stale-while-revalidate=604800");
+
+  // Support conditional requests (browser caching)
+  const ifNoneMatch = request.headers.get("if-none-match");
+  if (ifNoneMatch === object.httpEtag) {
+    return new Response(null, { status: 304, headers });
+  }
+
+  return new Response(object.body, { headers });
+}
+
+/**
+ * GET /api/images
+ * List all images in the R2 bucket. Auth required.
+ */
+async function handleListImages(env) {
+  const listed = await env.IMAGES.list();
+
+  const images = listed.objects.map((obj) => ({
+    key: obj.key,
+    size: obj.size,
+    uploaded: obj.uploaded,
+    url: `/images/${encodeURIComponent(obj.key)}`,
+    markdown: `![alt text](/images/${obj.key})`,
+  }));
+
+  return jsonNoCache({ images, count: images.length });
+}
+
+/**
+ * POST /api/images
+ * Upload an image. Expects multipart/form-data with a "file" field.
+ * Optionally accepts a "key" field to set a custom filename.
+ * Auth required.
+ */
+async function handleUploadImage(request, env) {
+  let formData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return json({ error: "Expected multipart/form-data" }, 400);
+  }
+
+  const file = formData.get("file");
+  if (!file || typeof file === "string") {
+    return json({ error: "Missing 'file' field in form data" }, 400);
+  }
+
+  // Validate content type
+  const contentType = file.type || "application/octet-stream";
+  if (!ALLOWED_IMAGE_TYPES.has(contentType.toLowerCase())) {
+    return json({ error: `Unsupported image type: ${contentType}` }, 415);
+  }
+
+  // Determine storage key
+  const customKey = formData.get("key");
+  const key = (typeof customKey === "string" && customKey.trim())
+    ? customKey.trim()
+    : file.name;
+
+  if (!key) {
+    return json({ error: "Could not determine a key/filename for the image" }, 400);
+  }
+
+  // Upload to R2
+  const arrayBuffer = await file.arrayBuffer();
+  await env.IMAGES.put(key, arrayBuffer, {
+    httpMetadata: { contentType },
+  });
+
+  return jsonNoCache({
+    ok: true,
+    key,
+    size: arrayBuffer.byteLength,
+    url: `/images/${encodeURIComponent(key)}`,
+    markdown: `![alt text](/images/${key})`,
+  }, 201);
+}
+
+/**
+ * GET /api/images/:key/info
+ * Return metadata for a single image. Auth required.
+ */
+async function handleImageInfo(key, env) {
+  const object = await env.IMAGES.head(key);
+
+  if (!object) {
+    return json({ error: "Image not found" }, 404);
+  }
+
+  return jsonNoCache({
+    key: object.key,
+    size: object.size,
+    uploaded: object.uploaded,
+    etag: object.httpEtag,
+    contentType: object.httpMetadata?.contentType,
+    url: `/images/${encodeURIComponent(key)}`,
+    markdown: `![alt text](/images/${key})`,
+  });
+}
+
+/**
+ * DELETE /api/images/:key
+ * Delete an image from R2. Auth required.
+ */
+async function handleDeleteImage(key, env) {
+  // Check object exists first
+  const existing = await env.IMAGES.head(key);
+  if (!existing) {
+    return json({ error: "Image not found" }, 404);
+  }
+
+  await env.IMAGES.delete(key);
+  return jsonNoCache({ ok: true, key });
+}
+
+// ---------------------------------------------------------------------------
 // Main fetch handler
 // ---------------------------------------------------------------------------
 export default {
@@ -255,20 +433,28 @@ export default {
     const { pathname } = url;
     const method = request.method;
 
+    // ---- CORS preflight (global) ------------------------------------------
+    if (method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: CORS_HEADERS,
+      });
+    }
+
+    // ---- Public image serving: GET /images/:key ---------------------------
+    if (method === "GET" && pathname.startsWith("/images/")) {
+      const key = decodeURIComponent(pathname.slice("/images/".length));
+      if (key) {
+        try {
+          return await handleServeImage(key, request, env);
+        } catch (err) {
+          return new Response("Error serving image", { status: 500 });
+        }
+      }
+    }
+
     // ---- API routes -------------------------------------------------------
     if (pathname.startsWith("/api/")) {
-      // CORS preflight
-      if (method === "OPTIONS") {
-        return new Response(null, {
-          status: 204,
-          headers: {
-            "access-control-allow-origin": "*",
-            "access-control-allow-methods": "GET, POST, OPTIONS",
-            "access-control-allow-headers": "Content-Type",
-          },
-        });
-      }
-
       try {
         // /api/health
         if (pathname === "/api/health" && method === "GET") {
@@ -308,13 +494,45 @@ export default {
           return await handlePostBySlug(slugMatch.slug, env);
         }
 
+        // ---- Image management API (all require auth) ----------------------
+
+        // /api/images (GET = list, POST = upload)
+        if (pathname === "/api/images") {
+          if (!isAuthorized(request, env)) {
+            return json({ error: "Unauthorized" }, 401, { "www-authenticate": "Bearer" });
+          }
+          if (method === "GET") return await handleListImages(env);
+          if (method === "POST") return await handleUploadImage(request, env);
+          return json({ error: "Method not allowed" }, 405);
+        }
+
+        // /api/images/:key/info (GET)
+        const imageInfoMatch = matchRoute("/api/images/:key/info", pathname);
+        if (imageInfoMatch) {
+          if (!isAuthorized(request, env)) {
+            return json({ error: "Unauthorized" }, 401, { "www-authenticate": "Bearer" });
+          }
+          if (method !== "GET") return json({ error: "Method not allowed" }, 405);
+          return await handleImageInfo(imageInfoMatch.key, env);
+        }
+
+        // /api/images/:key (DELETE)
+        const imageKeyMatch = matchRoute("/api/images/:key", pathname);
+        if (imageKeyMatch) {
+          if (!isAuthorized(request, env)) {
+            return json({ error: "Unauthorized" }, 401, { "www-authenticate": "Bearer" });
+          }
+          if (method !== "DELETE") return json({ error: "Method not allowed" }, 405);
+          return await handleDeleteImage(imageKeyMatch.key, env);
+        }
+
         return json({ error: "Not found" }, 404);
       } catch (err) {
         return json({ error: err.message || "Internal server error" }, 500);
       }
     }
 
-    // ---- Static assets (everything outside /api/) -------------------------
+    // ---- Static assets (everything outside /api/ and /images/) -----------
     return env.ASSETS.fetch(request);
   },
 };
