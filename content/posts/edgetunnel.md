@@ -50,6 +50,7 @@ Reference: [YouTube:2026 最强 Cloudflare 免费VPN自建](https://www.youtube.
 # 2. In Cloudflare Dashboard → Workers & Pages → Create Worker
 
 # 3. Deploy worker
+```
 
 **Key settings to configure:**
 
