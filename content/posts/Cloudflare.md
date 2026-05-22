@@ -2,7 +2,7 @@
 title: "Intro to Cloudflare"
 date: "2026-05-20"
 category: "electronics"
-excerpt: "A project enabling internet access in restricted regions using Cloudflare"
+excerpt: "An introduction to Cloudflare products and services"
 tags: ["Cloudflare", "Docs"]
 ---
 
