@@ -1,34 +1,46 @@
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+const DARK_MODE_KEY = "blog_dark_mode";
+
 const state = {
-  theme: "life",
+  space: "life",      // "life" | "electronics" — which post category is shown
+  darkMode: false,    // independent light/dark preference
   posts: [],
   currentSlug: null,
   view: "landing"
 };
 
-const blogShell = document.getElementById("blogShell");
-const enterLife = document.getElementById("enterLife");
-const enterElec = document.getElementById("enterElec");
-const backHome = document.getElementById("backHome");
-const skipToBlog = document.getElementById("skipToBlog");
-const modeToggle = document.getElementById("modeToggle");
-const sidebarTitle = document.getElementById("sidebarTitle");
-const sidebarDesc = document.getElementById("sidebarDesc");
-const postList = document.getElementById("postList");
-const postTitle = document.getElementById("postTitle");
-const postMeta = document.getElementById("postMeta");
-const postBody = document.getElementById("postBody");
-const yearEl = document.getElementById("year");
+// ---------------------------------------------------------------------------
+// DOM refs
+// ---------------------------------------------------------------------------
+const blogShell        = document.getElementById("blogShell");
+const enterLife        = document.getElementById("enterLife");
+const enterElec        = document.getElementById("enterElec");
+const backHome         = document.getElementById("backHome");
+const skipToBlog       = document.getElementById("skipToBlog");
+const spaceToggle      = document.getElementById("spaceToggle");
+const darkModeToggle   = document.getElementById("darkModeToggle");
+const blogIconSun      = document.getElementById("blogIconSun");
+const blogIconMoon     = document.getElementById("blogIconMoon");
+const sidebarTitle     = document.getElementById("sidebarTitle");
+const sidebarDesc      = document.getElementById("sidebarDesc");
+const postList         = document.getElementById("postList");
+const postTitle        = document.getElementById("postTitle");
+const postMeta         = document.getElementById("postMeta");
+const postBody         = document.getElementById("postBody");
+const yearEl           = document.getElementById("year");
 const landingThemePreview = document.getElementById("landingThemePreview");
-const landingThemeLabel = document.getElementById("landingThemeLabel");
-const iconSun = document.getElementById("iconSun");
-const iconMoon = document.getElementById("iconMoon");
-const likeRow = document.getElementById("likeRow");
-const likeBtn = document.getElementById("likeBtn");
-const likeCount = document.getElementById("likeCount");
-const drawerToggle = document.getElementById("drawerToggle");
-const sidebarClose = document.getElementById("sidebarClose");
-const sidebarBackdrop = document.getElementById("sidebarBackdrop");
-const blogSidebar = document.getElementById("blogSidebar");
+const landingThemeLabel   = document.getElementById("landingThemeLabel");
+const iconSun          = document.getElementById("iconSun");
+const iconMoon         = document.getElementById("iconMoon");
+const likeRow          = document.getElementById("likeRow");
+const likeBtn          = document.getElementById("likeBtn");
+const likeCount        = document.getElementById("likeCount");
+const drawerToggle     = document.getElementById("drawerToggle");
+const sidebarClose     = document.getElementById("sidebarClose");
+const sidebarBackdrop  = document.getElementById("sidebarBackdrop");
+const blogSidebar      = document.getElementById("blogSidebar");
 
 if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
@@ -41,6 +53,80 @@ marked.setOptions({
   }
 });
 
+// ---------------------------------------------------------------------------
+// Dark mode — persisted independently of space
+// ---------------------------------------------------------------------------
+function loadDarkModePreference() {
+  try {
+    const saved = localStorage.getItem(DARK_MODE_KEY);
+    if (saved !== null) return saved === "true";
+  } catch { /* ignore */ }
+  return false; // default: light
+}
+
+function saveDarkModePreference(value) {
+  try { localStorage.setItem(DARK_MODE_KEY, String(value)); } catch { /* ignore */ }
+}
+
+// ---------------------------------------------------------------------------
+// Apply the visual theme to <body> based solely on darkMode
+// ---------------------------------------------------------------------------
+function applyDarkMode() {
+  // "life" data-theme = light, "electronics" = dark
+  // We keep using these same CSS tokens — just driven by darkMode, not space
+  document.body.setAttribute("data-theme", state.darkMode ? "electronics" : "life");
+
+  // Blog header icons
+  if (blogIconSun)  blogIconSun.style.display  = state.darkMode ? "" : "none";
+  if (blogIconMoon) blogIconMoon.style.display = state.darkMode ? "none" : "";
+
+  // Landing preview button
+  syncLandingThemeUI();
+}
+
+// ---------------------------------------------------------------------------
+// Sync landing page dark/light preview button
+// ---------------------------------------------------------------------------
+function syncLandingThemeUI() {
+  if (!landingThemePreview || !landingThemeLabel) return;
+  landingThemePreview.setAttribute("aria-pressed", state.darkMode ? "true" : "false");
+  landingThemePreview.title = state.darkMode
+    ? "Switch to light mode (preview)"
+    : "Switch to dark mode (preview)";
+  landingThemeLabel.textContent = state.darkMode ? "Light mode" : "Dark mode";
+  if (iconSun)  iconSun.style.display  = state.darkMode ? "" : "none";
+  if (iconMoon) iconMoon.style.display = state.darkMode ? "none" : "";
+}
+
+// ---------------------------------------------------------------------------
+// Apply the space (post category) to sidebar labels and re-render list
+// ---------------------------------------------------------------------------
+function applySpace() {
+  const isLife = state.space === "life";
+  if (spaceToggle) {
+    spaceToggle.textContent = isLife ? "Switch to Electronics" : "Switch to Life";
+  }
+  sidebarTitle.textContent = isLife ? "Life" : "Electronics";
+  sidebarDesc.textContent  = isLife
+    ? "Everyday notes, ideas & routines."
+    : "Builds, schematics, code & math.";
+
+  if (state.view === "blog") {
+    renderList();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Combined full theme + space update
+// ---------------------------------------------------------------------------
+function applyAll() {
+  applyDarkMode();
+  applySpace();
+}
+
+// ---------------------------------------------------------------------------
+// View management
+// ---------------------------------------------------------------------------
 function setView(view) {
   state.view = view;
   document.body.setAttribute("data-view", view);
@@ -58,49 +144,34 @@ function setView(view) {
   }
 }
 
-function enterBlogWithTheme(theme) {
-  state.theme = theme;
+function enterBlogWithSpace(space) {
+  state.space = space;
   // Show blog shell before rendering: KaTeX / hljs can throw inside display:none
   setView("blog");
   requestAnimationFrame(() => {
-    applyTheme();
+    applyAll();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 }
 
-function syncLandingThemeUI() {
-  if (!landingThemePreview || !landingThemeLabel) return;
-  const isElec = state.theme === "electronics";
-  landingThemePreview.setAttribute("aria-pressed", isElec ? "true" : "false");
-  landingThemePreview.title = isElec
-    ? "Preview light background (stay on home)"
-    : "Preview dark background (stay on home)";
-  landingThemeLabel.textContent = isElec ? "Light preview" : "Dark preview";
-  if (iconSun)  iconSun.style.display  = isElec ? "none" : "";
-  if (iconMoon) iconMoon.style.display = isElec ? "" : "none";
-}
-
-function applyTheme() {
-  const isLife = state.theme === "life";
-  document.body.setAttribute("data-theme", isLife ? "life" : "electronics");
-  modeToggle.textContent = isLife ? "Switch to electronics" : "Switch to life";
-  sidebarTitle.textContent = isLife ? "Life" : "Electronics";
-  sidebarDesc.textContent = isLife
-    ? "Light theme for everyday notes."
-    : "Dark theme for builds and math.";
-  syncLandingThemeUI();
-  if (state.view === "blog") {
-    renderList();
-  }
-}
-
+// ---------------------------------------------------------------------------
+// Utility
+// ---------------------------------------------------------------------------
 function categoryName(category) {
   return category === "life" ? "Life" : "Electronics";
 }
 
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ---------------------------------------------------------------------------
+// Render post list in sidebar
+// ---------------------------------------------------------------------------
 function renderList() {
-  const category = state.theme === "life" ? "life" : "electronics";
-  const filtered = state.posts.filter((p) => p.category === category);
+  const filtered = state.posts.filter((p) => p.category === state.space);
   postList.innerHTML = "";
 
   if (!filtered.length) {
@@ -132,12 +203,6 @@ function renderList() {
   } else {
     renderPost(filtered[0].slug);
   }
-}
-
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 // ---------------------------------------------------------------------------
@@ -325,45 +390,65 @@ function renderPost(slug) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Event listeners
+// ---------------------------------------------------------------------------
+
+// Landing: dark/light preview toggle (does NOT navigate to blog)
 landingThemePreview?.addEventListener("click", () => {
-  state.theme = state.theme === "life" ? "electronics" : "life";
-  document.body.setAttribute("data-theme", state.theme === "life" ? "life" : "electronics");
-  syncLandingThemeUI();
+  state.darkMode = !state.darkMode;
+  saveDarkModePreference(state.darkMode);
+  applyDarkMode();
 });
 
-enterLife?.addEventListener("click", () => enterBlogWithTheme("life"));
-enterElec?.addEventListener("click", () => enterBlogWithTheme("electronics"));
+// Landing: enter a space
+enterLife?.addEventListener("click", () => enterBlogWithSpace("life"));
+enterElec?.addEventListener("click", () => enterBlogWithSpace("electronics"));
 
+// Blog: back to home
 backHome?.addEventListener("click", () => {
   setView("landing");
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
+// Blog: "Read blog" link from landing (skips to blog with current space)
 skipToBlog?.addEventListener("click", (e) => {
   e.preventDefault();
-  enterBlogWithTheme(state.theme);
+  enterBlogWithSpace(state.space);
 });
 
-modeToggle.addEventListener("click", () => {
-  state.theme = state.theme === "life" ? "electronics" : "life";
-  applyTheme();
+// Blog header: toggle space (Life ↔ Electronics)
+spaceToggle?.addEventListener("click", () => {
+  state.space = state.space === "life" ? "electronics" : "life";
+  applySpace();
 });
 
+// Blog header: toggle dark mode (light ↔ dark)
+darkModeToggle?.addEventListener("click", () => {
+  state.darkMode = !state.darkMode;
+  saveDarkModePreference(state.darkMode);
+  applyDarkMode();
+});
+
+// ---------------------------------------------------------------------------
+// Hash-based routing
+// ---------------------------------------------------------------------------
 function handleHashChange() {
   if (location.hash.startsWith("#blog")) {
     const slug = location.hash.split("/")[1];
-    let targetTheme = state.theme;
-    
+    let targetSpace = state.space;
+
     if (slug) {
       const post = state.posts.find(p => p.slug === slug);
       if (post) {
-        targetTheme = post.category === "life" ? "life" : "electronics";
+        // Navigate to the correct space for this post
+        targetSpace = post.category === "life" ? "life" : "electronics";
         state.currentSlug = slug;
       }
     }
-    
-    if (state.view !== "blog" || state.theme !== targetTheme) {
-      enterBlogWithTheme(targetTheme);
+
+    if (state.view !== "blog" || state.space !== targetSpace) {
+      enterBlogWithSpace(targetSpace);
     } else {
       if (slug) renderPost(slug);
     }
@@ -377,7 +462,14 @@ function handleHashChange() {
 
 window.addEventListener("hashchange", handleHashChange);
 
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
 async function init() {
+  // Load persisted dark mode preference
+  state.darkMode = loadDarkModePreference();
+  applyDarkMode();
+
   const res = await fetch("/api/posts?fields=full");
   const data = await res.json();
   state.posts = data.posts;
@@ -387,13 +479,13 @@ async function init() {
     if (slug) {
       const post = state.posts.find(p => p.slug === slug);
       if (post) {
-        state.theme = post.category === "life" ? "life" : "electronics";
+        state.space = post.category === "life" ? "life" : "electronics";
         state.currentSlug = slug;
       }
     }
-    enterBlogWithTheme(state.theme);
+    enterBlogWithSpace(state.space);
   } else {
-    applyTheme();
+    applyAll();
   }
 }
 

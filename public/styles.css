@@ -1765,6 +1765,47 @@ body[data-theme="electronics"] .like-btn.is-liked .like-icon {
   stroke: #fb7185;
 }
 
+/* ── Dark mode toggle (sun/moon icon button in blog header) ── */
+.dark-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(120, 113, 108, 0.22);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  color: var(--life-muted);
+  padding: 0;
+  transition: background 0.22s var(--ease-out), border-color 0.22s, color 0.22s,
+              transform 0.22s var(--ease-out), box-shadow 0.22s;
+  flex-shrink: 0;
+}
+
+.dark-mode-toggle:hover {
+  transform: rotate(18deg) scale(1.08);
+  background: var(--life-accent-soft);
+  border-color: rgba(13, 148, 136, 0.4);
+  color: var(--life-accent);
+  box-shadow: 0 6px 18px rgba(13, 148, 136, 0.18);
+}
+
+body[data-theme="electronics"] .dark-mode-toggle {
+  background: rgba(15, 23, 42, 0.75);
+  border-color: var(--elec-border);
+  color: var(--elec-muted);
+}
+
+body[data-theme="electronics"] .dark-mode-toggle:hover {
+  background: var(--elec-accent-soft);
+  border-color: rgba(34, 211, 238, 0.45);
+  color: var(--elec-accent);
+  box-shadow: 0 6px 18px rgba(34, 211, 238, 0.18);
+}
+
 /* ── Drawer toggle (hamburger) — hidden on desktop, shown on mobile ── */
 .nav-drawer-toggle {
   display: none;

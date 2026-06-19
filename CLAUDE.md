@@ -112,15 +112,30 @@ After adding or editing a post, run `npm run build:posts` to regenerate `public/
 
 ## Theme System
 
-The site has two themes, toggled by the user at runtime:
+The site has two **independent** axes:
 
-| Token | Life (light/warm) | Electronics (dark/cyan) |
+### Space (post category)
+Controls which posts are shown in the sidebar. Set via `state.space`.
+- **`"life"`** — shows Life posts; sidebar label reads "Life"
+- **`"electronics"`** — shows Electronics posts; sidebar label reads "Electronics"
+
+### Dark Mode (visual appearance)
+Controls the visual light/dark appearance. Set via `state.darkMode` (boolean), persisted to `localStorage` under key `blog_dark_mode`.
+- **`false` (light)** — sets `data-theme="life"` on `<body>` (warm paper background, teal accent)
+- **`true` (dark)** — sets `data-theme="electronics"` on `<body>` (OLED dark, cyan accent)
+
+| Token | Light (`data-theme="life"`) | Dark (`data-theme="electronics"`) |
 |---|---|---|
 | Background | `#f7f4ef` | `#030712` |
 | Accent | `#0d9488` teal | `#22d3ee` cyan |
 | Glass surface | `rgba(255,255,255,0.52)` | `rgba(15,23,42,0.58)` |
 
-Theme is applied by setting `data-theme="life"` or `data-theme="electronics"` on `<html>`. All theme-specific values are CSS custom properties defined in `styles.css` under the respective `[data-theme]` selectors. Post lists are filtered by category to match the active theme.
+### Controls
+- **Blog header — moon/sun icon button** (`#darkModeToggle`): toggles `darkMode` independently
+- **Blog header — "Switch to Life/Electronics" button** (`#spaceToggle`): switches the post space independently
+- **Landing — dark/light preview button** (`#landingThemePreview`): toggles `darkMode` without entering the blog
+- **Landing — "Life" / "Electronics" cards**: enter the blog in the respective space (dark mode unchanged)
+
 
 ## Reversi Game
 

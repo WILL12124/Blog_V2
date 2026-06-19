@@ -1,9 +1,22 @@
 [
   {
+    "slug": "OpenWrt",
+    "title": "Intro to OpenWrt",
+    "date": "2026-05-22",
+    "excerpt": "An introduction to OpenWrt for home network management",
+    "tags": [
+      "Network",
+      "Router",
+      "OpenWrt"
+    ],
+    "category": "electronics",
+    "content": "\n每个设备都要上网，每个设备都要装梯子软件，像ps5这种还根本装不了，家里老人反对在手机上装梯子怎么办？？？一个软路由解君愁！\n\n> **TL;DR** - OpenWrt 是一个开源路由器操作系统，将其装到旧电脑/路由器上即可当路由器用。配合Passwall插件可以实现全局翻墙，所有设备联网自动翻墙。\n\n**Reference** - [YouTube: 【从零开始】最详细的新手入门软路由指南](https://www.youtube.com/watch?v=JfSJmPFiL_s)\n\n---\n\n# Table of Contents\n1. [What is OpenWrt?](#i-what-is-openwrt)\n2. [Why use OpenWrt?](#ii-why-use-openwrt)\n3. [Installation](#iii-installation)\n4. [Configuration](#iv-configuration)"
+  },
+  {
     "slug": "Cloudflare",
     "title": "Intro to Cloudflare",
     "date": "2026-05-20",
-    "excerpt": "A project enabling internet access in restricted regions using Cloudflare",
+    "excerpt": "An introduction to Cloudflare products and services",
     "tags": [
       "Cloudflare",
       "Docs"
@@ -21,7 +34,7 @@
       "Proxy"
     ],
     "category": "electronics",
-    "content": "\nI built my own proxy to bypass the GFW using Cloudflare Workers and KV. The project is open-source and available on GitHub.\n\n> **TL;DR** — Edgetunnel is a proxy running on Cloudflare Workers. It's free, serverless, and requires no dedicated server. However, it is not very stable and may expose what site you are visiting.\n\n**Reference**: [github.com/cmliu/edgetunnel](https://github.com/cmliu/edgetunnel)\n\n---\n\n![alt text](/images/edgetunnel.png)\n\n## Table of Contents\n\n1. [Background](#i-background) — Why I built this and what problem it solves\n2. [Setup](#ii-setup) — Getting it running on your own account\n3. [Drawbacks](#iii-drawbacks) — What to watch out for\n\n---\n\n## I. Background\n\nThe Great Firewall (GFW) in China blocks many websites and services, making it hard to access the open internet. While commercial VPNs exist, they are often unreliable and can be blocked or throttled.\n\nI built this project to find a backup solution. Cloudflare Workers lets you run code globally on their edge network, which has IPs that are generally not blocked by the GFW.\n\nBy routing VLESS traffic through a Worker, you can create a lightweight, serverless proxy that's fast, reliable, and free to run at small scale.\n\n---\n\n## II. Setup\n\nReference: [YouTube:2026 最强 Cloudflare 免费VPN自建](https://www.youtube.com/watch?v=chcFg878840)\n\n### Prerequisites\n\n- A free Cloudflare account\n- A custom domain added to Cloudflare\n\n### Deployment Steps\n\n```bash\n# 1. Fork the repository on GitHub\n# 2. In Cloudflare Dashboard → Workers & Pages → Create Worker\n\n# 3. Deploy worker\n\n**Key settings to configure:**\n\n- Set your **UUID** as a KV value (used to authenticate clients)\n- Bind your KV namespace to the Worker under `Settings → Variables`\n- Add a custom domain to the Worker. **Avoid using free subdomains which may cause the worker being blocked or data leaked.**\n\n## III. Drawbacks\n\nEdgeTunnel's performance heavily depends on the \"Preferred IP\" (优选IP) configuration — in my experience, connection drops and instability are common.\n\nAdditionally, since the proxy itself runs on Cloudflare's infrastructure, it cannot directly access other Cloudflare-hosted domains such as Discord, Shopify, or even this website. To work around this, EdgeTunnel's developers route traffic to these destinations through third-party IPs of unknown origin. While HTTPS encryption protects the content of your requests, your browsing patterns and visited domains may still be exposed to whoever operates those IPs.\n"
+    "content": "\nI built my own proxy to bypass the GFW using Cloudflare Workers and KV. The project is open-source and available on GitHub.\n\n> **TL;DR** — Edgetunnel is a proxy running on Cloudflare Workers. It's free, serverless, and requires no dedicated server. However, it is not very stable and may expose what site you are visiting.\n\n**Reference**: [github.com/cmliu/edgetunnel](https://github.com/cmliu/edgetunnel)\n\n---\n\n![alt text](/images/edgetunnel.png)\n\n## Table of Contents\n\n1. [Background](#i-background) — Why I built this and what problem it solves\n2. [Setup](#ii-setup) — Getting it running on your own account\n3. [Drawbacks](#iii-drawbacks) — What to watch out for\n\n---\n\n## I. Background\n\nThe Great Firewall (GFW) in China blocks many websites and services, making it hard to access the open internet. While commercial VPNs exist, they are often unreliable and can be blocked or throttled.\n\nI built this project to find a backup solution. Cloudflare Workers lets you run code globally on their edge network, which has IPs that are generally not blocked by the GFW.\n\nBy routing VLESS traffic through a Worker, you can create a lightweight, serverless proxy that's fast, reliable, and free to run at small scale.\n\n---\n\n## II. Setup\n\nReference: [YouTube:2026 最强 Cloudflare 免费VPN自建](https://www.youtube.com/watch?v=chcFg878840)\n\n### Prerequisites\n\n- A free Cloudflare account\n- A custom domain added to Cloudflare\n\n### Deployment Steps\n\n```bash\n# 1. Fork the repository on GitHub\n# 2. In Cloudflare Dashboard → Workers & Pages → Create Worker\n\n# 3. Deploy worker\n```\n\n**Key settings to configure:**\n\n- Set your **UUID** as a KV value (used to authenticate clients)\n- Bind your KV namespace to the Worker under `Settings → Variables`\n- Add a custom domain to the Worker. **Avoid using free subdomains which may cause the worker being blocked or data leaked.**\n\n## III. Drawbacks\n\nEdgeTunnel's performance heavily depends on the \"Preferred IP\" (优选IP) configuration — in my experience, connection drops and instability are common.\n\nAdditionally, since the proxy itself runs on Cloudflare's infrastructure, it cannot directly access other Cloudflare-hosted domains such as Discord, Shopify, or even this website. To work around this, EdgeTunnel's developers route traffic to these destinations through third-party IPs of unknown origin. While HTTPS encryption protects the content of your requests, your browsing patterns and visited domains may still be exposed to whoever operates those IPs.\n"
   },
   {
     "slug": "reversi_bot",
@@ -32,8 +45,8 @@
       "Reversi",
       "AI bot"
     ],
-    "category": "electronics",
-    "content": "\r\n![Reversi board screenshot](/images/asset.jpg)\r\nIn our course APS105, there is a \"bot competition\" that everyone builds a reversi bot and played against other's bot. My reversi bot ranked 9th out of 440 students on the leader board. If you are interested, the same algorithm is playable on site!\r\n\r\n**Algorithm**: It uses a Minimax algorithm with Alpha-Beta pruning to look several turns ahead and discard bad options. To allow more search in given time limit, it uses iterative deepening, meaning it digs as deep into the game tree as possible within a strict 0.93-second time limit.\r\n\r\n**Stratergy**: It prioritizes controlling the corners and keeping its move options open (mobility) rather than just grabbing the most pieces early on. It also shifts its logic as the game progresses.\r\n"
+    "category": "life",
+    "content": "\n![Reversi board screenshot](/images/asset.jpg)\nIn our course APS105, there is a \"bot competition\" that everyone builds a reversi bot and played against other's bot. My reversi bot ranked 9th out of 440 students on the leader board. If you are interested, the same algorithm is playable on site!\n\n**Algorithm**: It uses a Minimax algorithm with Alpha-Beta pruning to look several turns ahead and discard bad options. To allow more search in given time limit, it uses iterative deepening, meaning it digs as deep into the game tree as possible within a strict 0.93-second time limit.\n\n**Stratergy**: It prioritizes controlling the corners and keeping its move options open (mobility) rather than just grabbing the most pieces early on. It also shifts its logic as the game progresses.\n"
   },
   {
     "slug": "life-first",
@@ -45,7 +58,7 @@
       "journal"
     ],
     "category": "life",
-    "content": "\r\nThe finals are comming, i should probably go study MIE100 :\\\r\n\r\nA tiny formula from MIE, just to check my LaTex rendering:\r\n\r\n$$\\vec{a}_B = \\vec{a}_A + \\vec{\\alpha} \\times \\vec{r}_{B/A} + \\vec{\\omega} \\times (\\vec{\\omega} \\times \\vec{r}_{B/A})$$\r\n\r\nAcceleration between to points on rigid body (2D)\r\n"
+    "content": "\nThe finals are comming, i should probably go study MIE100 :\\\n\nA tiny formula from MIE, just to check my LaTex rendering:\n\n$$\\vec{a}_B = \\vec{a}_A + \\vec{\\alpha} \\times \\vec{r}_{B/A} + \\vec{\\omega} \\times (\\vec{\\omega} \\times \\vec{r}_{B/A})$$\n\nAcceleration between to points on rigid body (2D)\n"
   },
   {
     "slug": "electronics-first",
@@ -57,6 +70,6 @@
       "Cloudflare"
     ],
     "category": "electronics",
-    "content": "\r\nFinally! after about 4 hours of chatting with ai, i made this static webpage run on Cloudflare Pages and deployed on my custom domain. I didn't realize the time and now it's 1:21am already, I'd probably go to bed after posting this.\r\n\r\nI genuinely found building something internet-related is cool and fun. I remember tonight i first started browsing building personal VPS stuffs, look where i am now at :). I found this edgetunnel thing that uses Cloudeflare to bypass the GFW. It made me remember my personal blog v1 (on Github Pages) and decided to bring it further.\r\n\r\nNext: Refine the webpage and consider using Cloudflare Workers for small backend\r\n\r\nSpecial Thanks:\r\n\r\n$$\r\n\\begin{aligned}\r\nClaude Sonnet 4.6 ||\r\nClaude Opus 4.6 ||\r\nGemini 3.1 pro ||\r\nCursor\r\n\\end{aligned}\r\n$$\r\n"
+    "content": "\nFinally! after about 4 hours of chatting with ai, i made this static webpage run on Cloudflare Pages and deployed on my custom domain. I didn't realize the time and now it's 1:21am already, I'd probably go to bed after posting this.\n\nI genuinely found building something internet-related is cool and fun. I remember tonight i first started browsing building personal VPS stuffs, look where i am now at :). I found this edgetunnel thing that uses Cloudeflare to bypass the GFW. It made me remember my personal blog v1 (on Github Pages) and decided to bring it further.\n\nNext: Refine the webpage and consider using Cloudflare Workers for small backend\n\nSpecial Thanks:\n\n$$\n\\begin{aligned}\nClaude Sonnet 4.6 ||\nClaude Opus 4.6 ||\nGemini 3.1 pro ||\nCursor\n\\end{aligned}\n$$\n"
   }
 ]
