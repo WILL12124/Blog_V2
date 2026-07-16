@@ -1,5 +1,18 @@
 [
   {
+    "slug": "Investing",
+    "title": "Investing",
+    "date": "2026-07-16",
+    "excerpt": "Some thoughts in investing.",
+    "tags": [
+      "Investing",
+      "Stocks"
+    ],
+    "category": "life",
+    "content": "\nAfter putting real money in the market for several months, I have gained some insights and want to put them down below. \n\nFrom March 11 to July 16, I invested in several stocks, including AMD, Qualcomn, Nike, Tencent and Midea. I deposited 7,166CAD in total, and now I have a total value of 8,176CAD.\n\nAfter reflecting the decisions I made, I found that:\n\n## 1. Be able to hold stocks after a rise.\n*拿住股票是关键*\n\nWhen buying long, a good company can double or triple in a few years. Even some of your choices go wrong, the overall benefit of holding is still positive.\n\n## 2. Build your own invest philosophy/plan.\n*要有自己的交易策略*\n\nIf you don't have your own trading philosophy, you will be swayed by others or the market easily.\n\n",
+    "passwordHash": "ded4d6f049e910e06603b505322e66c19bd60c3e98f85432c4136dd22a38eb3b"
+  },
+  {
     "slug": "OpenWrt",
     "title": "Intro to OpenWrt",
     "date": "2026-06-21",

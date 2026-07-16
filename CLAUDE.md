@@ -103,10 +103,13 @@ date: "2026-04-09"
 category: "life"       # or "electronics" — auto-inferred from filename prefix if omitted
 excerpt: "Short summary"
 tags: ["tag1", "tag2"]
+password: "secret"     # optional — locks the post behind a password prompt
 ---
 ```
 
 Category is auto-inferred: filenames starting with `life-` → `"life"`, all others → `"electronics"`.
+
+**Password-protected posts:** If `password` is set, the build script hashes it with SHA-256 and stores the hash (not the plaintext) in `posts.json` as `passwordHash`. On the frontend, the post content is hidden behind a lock overlay until the reader enters the correct password. Unlocked posts are remembered in `localStorage`.
 
 After adding or editing a post, run `npm run build:posts` to regenerate `public/data/posts.json`.
 

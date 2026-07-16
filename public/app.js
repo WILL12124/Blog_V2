@@ -2,6 +2,7 @@
 // State
 // ---------------------------------------------------------------------------
 const DARK_MODE_KEY = "blog_dark_mode";
+const UNLOCKED_KEY = "blog_unlocked_posts";
 
 const state = {
   space: "life",      // "life" | "electronics" — which post category is shown
@@ -168,6 +169,130 @@ function escapeHtml(text) {
 }
 
 // ---------------------------------------------------------------------------
+// Password / Unlock helpers
+// ---------------------------------------------------------------------------
+
+/** Get list of unlocked slugs from localStorage */
+function getUnlockedSlugs() {
+  try {
+    return JSON.parse(localStorage.getItem(UNLOCKED_KEY) || "[]");
+  } catch { return []; }
+}
+
+/** Mark a post as unlocked in localStorage */
+function markAsUnlocked(slug) {
+  const unlocked = getUnlockedSlugs();
+  if (!unlocked.includes(slug)) {
+    unlocked.push(slug);
+    localStorage.setItem(UNLOCKED_KEY, JSON.stringify(unlocked));
+  }
+}
+
+/** Check if a post has been unlocked */
+function isUnlocked(slug) {
+  return getUnlockedSlugs().includes(slug);
+}
+
+/** Check if a post is locked (has passwordHash and not yet unlocked) */
+function isPostLocked(post) {
+  return !!post.passwordHash && !isUnlocked(post.slug);
+}
+
+/** Hash a string with SHA-256 using Web Crypto API, return hex */
+async function sha256(text) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** Attempt to unlock a post — returns true on success */
+async function attemptUnlock(slug, passwordHash, inputPassword) {
+  const inputHash = await sha256(inputPassword);
+  if (inputHash === passwordHash) {
+    markAsUnlocked(slug);
+    return true;
+  }
+  return false;
+}
+
+/** Render the lock overlay inside the content area */
+function renderLockOverlay(slug, passwordHash) {
+  // Hide likes for locked posts
+  likeRow.style.display = "none";
+
+  postBody.innerHTML = `
+    <div class="lock-overlay" id="lockOverlay">
+      <div class="lock-visual">
+        <svg class="lock-icon-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="12" cy="16.5" r="1.5" fill="currentColor"/>
+          <path d="M12 18v1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 class="lock-title">This post is protected</h3>
+      <p class="lock-message">Enter the password to view the content</p>
+      <form class="lock-form" id="lockForm">
+        <div class="lock-input-wrap" id="lockInputWrap">
+          <input
+            type="password"
+            class="lock-input"
+            id="lockInput"
+            placeholder="Enter password…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button type="submit" class="lock-submit" id="lockSubmit" title="Unlock">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </button>
+        </div>
+        <p class="lock-error" id="lockError"></p>
+      </form>
+    </div>
+  `;
+
+  const form = document.getElementById("lockForm");
+  const input = document.getElementById("lockInput");
+  const errorEl = document.getElementById("lockError");
+  const inputWrap = document.getElementById("lockInputWrap");
+  const overlay = document.getElementById("lockOverlay");
+
+  // Focus the input
+  requestAnimationFrame(() => input.focus());
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const pw = input.value;
+    if (!pw.trim()) return;
+
+    const success = await attemptUnlock(slug, passwordHash, pw);
+
+    if (success) {
+      // Smooth unlock animation
+      overlay.classList.add("lock-unlocking");
+      setTimeout(() => {
+        renderPost(slug);
+      }, 500);
+    } else {
+      // Wrong password — shake + error
+      inputWrap.classList.add("lock-shake");
+      errorEl.textContent = "Incorrect password";
+      errorEl.classList.add("is-visible");
+      input.value = "";
+      input.focus();
+
+      setTimeout(() => {
+        inputWrap.classList.remove("lock-shake");
+      }, 600);
+    }
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Render post list in sidebar
 // ---------------------------------------------------------------------------
 function renderList() {
@@ -183,11 +308,24 @@ function renderList() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "post-card reveal";
+    if (isPostLocked(post)) btn.classList.add("post-card--locked");
     btn.dataset.slug = post.slug;
     btn.style.setProperty("--d", `${index * 0.07}s`);
+
+    const lockBadge = post.passwordHash
+      ? `<span class="post-card-lock" aria-label="Password protected" title="Password protected">
+           <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+             <rect x="3" y="11" width="18" height="11" rx="2"/>
+             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+           </svg>
+         </span>`
+      : "";
+
+    const excerptText = isPostLocked(post) ? "Password protected" : escapeHtml(post.excerpt || "");
+
     btn.innerHTML = `
-      <strong>${escapeHtml(post.title)}</strong>
-      <span>${escapeHtml(post.excerpt || "")}</span>
+      <strong>${lockBadge}${escapeHtml(post.title)}</strong>
+      <span>${excerptText}</span>
       <span class="date">${escapeHtml(post.date)}</span>
     `;
     btn.addEventListener("click", () => {
@@ -353,6 +491,12 @@ function renderPost(slug) {
 
   const tags = Array.isArray(post.tags) ? post.tags.join(", ") : "";
   postMeta.textContent = `${post.date} | ${categoryName(post.category)}${tags ? ` | ${tags}` : ""}`;
+
+  // Check if post is locked
+  if (isPostLocked(post)) {
+    renderLockOverlay(slug, post.passwordHash);
+    return;
+  }
 
   // Show initial like count from list data, then refresh from API
   updateLikeUI(slug, post.likes || 0);

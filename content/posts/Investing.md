@@ -4,6 +4,7 @@ date: "2026-07-16"
 category: "life"
 excerpt: "Some thoughts in investing."
 tags: ["Investing","Stocks"]
+password: "dfre#489274"
 ---
 
 After putting real money in the market for several months, I have gained some insights and want to put them down below. 

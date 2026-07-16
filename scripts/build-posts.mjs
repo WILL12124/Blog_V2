@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import crypto from "node:crypto";
 import matter from "gray-matter";
 
 const root = process.cwd();
@@ -13,6 +14,11 @@ function slugFromFilename(filename) {
 
 function inferCategory(slug) {
   return slug.startsWith("life-") ? "life" : "electronics";
+}
+
+/** Hash a password string with SHA-256 and return hex digest */
+function hashPassword(password) {
+  return crypto.createHash("sha256").update(password, "utf8").digest("hex");
 }
 
 async function main() {
@@ -34,7 +40,7 @@ async function main() {
     const slug = data.slug || slugFromFilename(file);
     const category = data.category || inferCategory(slug);
 
-    posts.push({
+    const post = {
       slug,
       title: data.title || slug,
       date: data.date || "1970-01-01",
@@ -42,7 +48,14 @@ async function main() {
       tags: Array.isArray(data.tags) ? data.tags : [],
       category,
       content
-    });
+    };
+
+    // Hash password at build time — raw password is never shipped
+    if (data.password) {
+      post.passwordHash = hashPassword(String(data.password));
+    }
+
+    posts.push(post);
   }
 
   posts.sort((a, b) => (a.date < b.date ? 1 : -1));
